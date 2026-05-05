@@ -1,0 +1,14 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+
+# Data files (Don't upload the database or huge CSVs)
+data/score.db
+
+# Virtual environments
+venv/
+.env
+
+# MacOS/Windows noise
+.DS_Store
+Thumbs.db
