@@ -64,7 +64,9 @@ The pipeline follows a sequential flow from raw data to evaluation:
 ## 4. Key EDA findings & Feature Processing
 
 ### Findings Summary
-- **Attendance & Study Hours**: Strongest positive correlation with test scores.- Tuition: Significant performance boost for students with external tuition.- Sleep Threshold: EDA revealed that students with <7 hours of sleep rarely score above 50.
+- **Attendance & Study Hours**: Strongest positive correlation with test scores.<br>
+- **Tuition**: Significant performance boost for students with external tuition.<br>
+- **Sleep Threshold**: EDA revealed that students with <7 hours of sleep rarely score above 50.
 
 | Feature | Type | Processing Action | Reason |
 | :--- | :--- | :--- | :--- |
