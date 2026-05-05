@@ -12,7 +12,7 @@ This repository contains an end-to-end machine learning pipeline designed to pre
 To download the database used in this case study is score.db which can be downloaded from here:
 https://techassessment.blob.core.windows.net/aiap-preparatory-bootcamp/score.db
 
-## Project Structure
+# Project Structure
 
 ```text
 student_score_project/
@@ -26,6 +26,7 @@ student_score_project/
 │   └── evaluation.py    # Performance metrics calculation
 ├── requirements.txt    # Python dependencies
 └── README.md           # Project documentation and usage instructions
+```
 
 ## 2. Instructions for execution
 
