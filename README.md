@@ -7,7 +7,7 @@ https://github.com/AISG-AIAP/AIAP-Technical-Assessment-Past-Years-Series
 
 I have selected to use the "Student Score Prediction" case study from the Past Year Series to practise building an end-to-end ML pipeline covering EDA/ML Pipeline as requirements to pass the AIAP Technical Assessment.
 
-This repository contains an end-to-end machine learning pipeline designed to predict O-level mathematics scores for U.A. Secondary School. The goal is to identify students who may require additional academic support before the examination.
+The pipeline is designed to predict O-level mathematics scores for U.A. Secondary School. The goal is to identify students who may require additional academic support before the examination.
 
 To download the database used in this case study is score.db which can be downloaded from here:
 https://techassessment.blob.core.windows.net/aiap-preparatory-bootcamp/score.db
