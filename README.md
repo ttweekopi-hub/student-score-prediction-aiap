@@ -85,7 +85,7 @@ While the assessment requires exploring multiple models, Random Forest was selec
 - **Robustness**: It handles various data types and multi-modal distributions effectively without extensive scaling.
 
 ## 6. Evaluation Metrics
-- **RMSE (Root Mean Squared Error)**: Chosen to quantify the average deviation in test marks. Our result of 4.49 indicates high precision for school interventions.
+- **RMSE (Root Mean Squared Error)**: Chosen to quantify the average deviation in test marks. The result of 4.49 indicates high precision for school interventions.
 
-- **R² (R-Squared)**: Chosen to measure the proportion of variance explained. Our result of 0.8968 proves the features selected have strong explanatory power.
+- **R² (R-Squared)**: Chosen to measure the proportion of variance explained. The result of 0.8968 proves the features selected have strong explanatory power.
 
