@@ -1,56 +1,63 @@
-import pandas as pd  # Import pandas for data manipulation
-import sqlite3  # Import sqlite3 to connect to the database
-from datetime import datetime  # Import datetime for time calculations
+import pandas as pd # Data manipulation
+import sqlite3 # Database connection
+from datetime import datetime # Date/Time operations
+import json # To read the configuration file
 
+def load_config(config_path="config.json"):
+    with open(config_path, "r") as f:
+        return json.load(f) # Parse and return JSON as a dictionary
 
 def load_data(db_path):
-    conn = sqlite3.connect(db_path)  # Establish connection to the database
-    query = "SELECT * FROM score"  # Define SQL query to fetch all data
-    df = pd.read_sql_query(query, conn)  # Load data into a DataFrame
-    conn.close()  # Close the database connection
-    return df  # Return the loaded dataframe
-
-
-def process_data(df):
-    # 0. Drop rows where the target (final_test) is missing
-    # We cannot train a model on data that has no answer key
-    df = df.dropna(subset=['final_test'])  # NEW LINE HERE
-
-    # 1. Drop Red Herrings and Multicollinear features
-    cols_to_drop = ['student_id', 'bag_color', 'mode_of_transport', 'n_female']
-    df = df.drop(columns=cols_to_drop)
-
-    # 2. Standardize Categorical Redundancies
-    df['tuition'] = df['tuition'].replace({'Y': 'Yes', 'N': 'No'})
-
-    # 3. Feature Engineering: Sleep Duration
-    def calc_sleep(row):
-        fmt = '%H:%M'
-        start = datetime.strptime(row['sleep_time'], fmt)
-        end = datetime.strptime(row['wake_time'], fmt)
-        diff = (end - start).total_seconds() / 3600
-        return diff + 24 if diff < 0 else diff
-
-    df['sleep_duration'] = df.apply(calc_sleep, axis=1)
-    df = df.drop(columns=['sleep_time', 'wake_time'])
-
-    # 4. Final Cleanup: Handle missing values in FEATURES
-    # If study hours or attendance are missing, we fill them with the median
-    df = df.fillna(df.median(numeric_only=True))
-
+    conn = sqlite3.connect(db_path) # Establish DB connection
+    query = "SELECT * FROM score" # Query statement
+    df = pd.read_sql_query(query, conn) # Pull data to DataFrame
+    conn.close() # Close connection
     return df
 
-import os
+def process_data(df, config):
+    # 1. Drop rows where target variable is missing
+    target = config["data"]["target_column"]
+    df = df.dropna(subset=[target])
+    
+    # 2. Drop columns defined in the config
+    cols_to_drop = config["data"]["drop_columns"]
+    # Only drop columns that actually exist in the dataframe to prevent errors
+    cols_to_drop = [col for col in cols_to_drop if col in df.columns]
+    df = df.drop(columns=cols_to_drop)
+    
+    # 3. Standardize Categorical Redundancies
+    # Standardize 'tuition' formatting
+    if 'tuition' in df.columns:
+        df['tuition'] = df['tuition'].replace({'Y': 'Yes', 'N': 'No'})
+        
+    # Standardize 'CCA' formatting (Replace 'NONE' with 'None')
+    if 'CCA' in df.columns:
+        df['CCA'] = df['CCA'].replace({'NONE': 'None'})
+    
+    # 4. Feature Engineering: Sleep Duration
+    if 'sleep_time' in df.columns and 'wake_time' in df.columns:
+        def calc_sleep(row):
+            fmt = '%H:%M'
+            start = datetime.strptime(row['sleep_time'], fmt)
+            end = datetime.strptime(row['wake_time'], fmt)
+            diff = (end - start).total_seconds() / 3600
+            return diff + 24 if diff < 0 else diff
+        
+        df['sleep_duration'] = df.apply(calc_sleep, axis=1)
+        df = df.drop(columns=['sleep_time', 'wake_time'])
+    
+    # 5. Dynamic Imputation Strategy based on config
+    strategy = config["data"]["imputation_strategy"]
+    if strategy == "median":
+        df = df.fillna(df.median(numeric_only=True))
+    elif strategy == "mean":
+        df = df.fillna(df.mean(numeric_only=True))
+        
+    return df
 
 if __name__ == "__main__":
-    # Get the directory where preprocessing.py actually lives
-    script_dir = os.path.dirname(__file__)
-
-    # Build the path to the database (go up to src, then into data)
-    db_path = os.path.join(script_dir, '..', 'data', 'score.db')
-    save_path = os.path.join(script_dir, '..', 'data', 'cleaned_score.csv')
-
-    raw_df = load_data(db_path)
-    clean_df = process_data(raw_df)
-    clean_df.to_csv(save_path, index=False)
-    print(f"Preprocessing Complete: Saved to {save_path}")
+    config = load_config() # Load experimental parameters
+    raw_df = load_data(config["data"]["db_path"]) # Ingest raw data
+    clean_df = process_data(raw_df, config) # Process data
+    clean_df.to_csv(config["data"]["cleaned_csv_path"], index=False) # Save output
+    print(f"Preprocessing Complete: Saved to {config['data']['cleaned_csv_path']}")

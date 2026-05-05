@@ -26,26 +26,63 @@ student-score-prediction-aiap/
 │   └── evaluation.py    # Performance metrics calculation
 ├── requirements.txt    # Python dependencies
 └── README.md           # Project documentation and usage instructions
+└── config.json         # central control file to change model settings
 ```
 
-## 2. Instructions for execution
+## 2. Instructions for Execution & Parameter Modification
 
-To run the pipeline, ensure you have the score.db file downloaded and placed in the data/ folder.
+The pipeline is highly configurable and supports execution with different machine learning algorithms and parameters using a combination of a configuration file (`config.json`) and command-line interface (CLI) parameter overrides.
 
-1. Install Dependencies:<br>
-*pip install -r requirements.txt*
+To run the pipeline, ensure you have the *score.db* file downloaded and placed in the data/ folder.<br>
 
-2. Run Preprocessing:<br>
-*python src/preprocessing.py*<br>
-This fetches data via SQLite, cleans features, and performs feature engineering.
+## 2.1. Install Dependencies:<br>
+    pip install -r requirements.txt
 
-3. Run Training:<br>
-*python src/train.py*<br>
-This trains the model and saves the .pkl file in the models/ directory.
+## 2.2 Run Preprocessing:<br>
+This fetches data via SQLite, cleans features, and performs feature engineering.<br>
 
-4. Run Evaluation:<br>
-*python src/evaluation.py*<br>
-This outputs the final RMSE and R² scores.
+
+    python src/preprocessing.py
+
+## 2.3 Model Training (With Model Swapping)<br>
+You can train models using the default settings in config.json or swap algorithms directly using command-line arguments.<br>
+<br>
+**Option A: Train the Default Model (Random Forest)**<br>
+This runs using the default hyperparameters and configuration specified inside config.json.<br>
+    
+    python src/train.py
+
+Output is saved to: models/student_model.pkl (as specified in config.json)<br>
+<br>
+**Option B: Train a Linear Regression Baseline**<br>
+Overrides the default model from the terminal. This automatically resets the hyperparameters to suit a linear baseline.<br>
+
+    python src/train.py --model LinearRegression
+
+Output is saved to: models/LinearRegression_model.pkl<br>
+<br>
+**Option C: Train a Gradient Boosting Regressor**<br>
+
+    python src/train.py --model GradientBoostingRegressor
+
+Output is saved to: models/gradientboostingregressor_model.pkl<br>
+
+## 2.4 Model Evaluation:<br>
+Evaluate your trained models dynamically by passing matching command-line arguments.<br>
+<br>
+**Evaluate Default Model (Random Forest):**<br>
+
+    python src/evaluation.py
+
+**Evaluate Linear Regression:**
+
+    python src/evaluation.py --model LinearRegression
+
+**Evaluate Gradient Boosting:**<br>
+
+    python src/evaluation.py --model GradientBoostingRegressor
+
+All evaluation will output the final RMSE and R² scores.
 
 ## 3. Pipeline flow and Logical Steps
 
@@ -78,16 +115,47 @@ The pipeline follows a sequential flow from raw data to evaluation:
 
 ## 5. Choice of Model and Evaluation
 
-### Model Choice: Random Forest Regressor:<br>
+To promote easy experimentation, all model training configurations are centralized. The workflow can be fine-tuned using the following parameters:<br>
+<br>
+**The Configuration Command Center (config.json)**<br>
+The *config.json* file controls directories, database targets, column modifications, and default model hyperparameters:<br>
+<br>
+```json
+{
+  "data": {
+    "db_path": "data/score.db",
+    "cleaned_csv_path": "data/cleaned_score.csv",
+    "target_column": "final_test",
+    "drop_columns": ["student_id", "bag_color", "mode_of_transport", "n_female"],
+    "imputation_strategy": "median"
+  },
+  "model": {
+    "algorithm": "RandomForestRegressor",
+    "parameters": {
+      "n_estimators": 100,
+      "max_depth": 10,
+      "random_state": 42
+    },
+    "save_path": "models/student_model.pkl"
+  }
+}
+```
 
-While the assessment requires exploring multiple models, Random Forest was selected as the final model due to:  
+### Choice of Evaluated Algorithms:<br>
 
-- **Non-linearity**: Its ability to capture "threshold" effects (like the 7-hour sleep rule) that Linear Regression misses.
-
-- **Robustness**: It handles various data types and multi-modal distributions effectively without extensive scaling.
+**Random Forest Regressor (Default Ensemble Model)**<br>
+*Why Chosen*: Excellent at capturing complex interaction thresholds in student habits (such as the non-linear relationship where score performance drops sharply below 7 hours of sleep).
+<br>
+*Strengths*: Extremely robust against multi-modal distributions and requires no scaling.<br>
+<br>
+**Gradient Boosting Regressor (Sequential Ensemble Model)**<br>
+*Why Chosen*: Builds trees sequentially to minimize residual errors, often achieving tighter fitting and lower error margins than Random Forest.<br>
+<br>
+**Linear Regression (Baseline Parametric Model)**<br>
+*Why Chosen*: Serves as a vital baseline to quantify the performance boost gained by transitioning to non-linear tree-based models.
 
 ## 6. Evaluation Metrics
 - **RMSE (Root Mean Squared Error)**: Chosen to quantify the average deviation in test marks. The result of 4.49 indicates high precision for school interventions.
 
-- **R² (R-Squared)**: Chosen to measure the proportion of variance explained. The result of 0.8968 proves the features selected have strong explanatory power.
+- **R² (R-Squared)**: Chosen to measure the proportion of variance explained. An R² score of 0.8968 confirms that roughly 90% of a student's score variance is explained by their academic habits, attendance, and sleep duration.
 
