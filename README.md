@@ -12,15 +12,18 @@ This repository contains an end-to-end machine learning pipeline designed to pre
 To download the database used in this case study is score.db which can be downloaded from here:
 https://techassessment.blob.core.windows.net/aiap-preparatory-bootcamp/score.db
 
+## Project Structure
+
+```text
 student_score_project/
 ├── data/               # Contains cleaned_score.csv (score.db must be placed here)
 ├── models/             # Stores the trained student_model.pkl
-├── src/                # Python modules for the pipeline
-│   ├── preprocessing.py# Data ingestion, cleaning, and feature engineering
-│   ├── train.py        # Model training and pipeline serialization
-│   └── evaluation.py   # Performance metrics calculation
 ├── notebooks/          # Stores the Jupyter notebook file
-|   ├── eda.ipynb       # Exploratory Data Analysis and visualizations
+│   └── eda.ipynb       # Exploratory Data Analysis and visualizations
+├── src/                # Python modules for the pipeline
+│   ├── preprocessing.py # Data ingestion, cleaning, and feature engineering
+│   ├── train.py         # Model training and pipeline serialization
+│   └── evaluation.py    # Performance metrics calculation
 ├── requirements.txt    # Python dependencies
 └── README.md           # Project documentation and usage instructions
 
