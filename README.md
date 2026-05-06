@@ -71,16 +71,16 @@ This is the step-by-step execution option for running the pipeline.  It is highl
 
 **Ensure you have the *score.db* file downloaded and placed in the data/ folder before starting.**<br>
 
-## 3.1. Install Dependencies:<br>
+### 3.1. Install Dependencies:<br>
     pip install -r requirements.txt
 
-## 3.2 Run Preprocessing:<br>
+### 3.2 Run Preprocessing:<br>
 This fetches data via SQLite, cleans features, and performs feature engineering.<br>
 
 
     python src/preprocessing.py
 
-## 3.3 Model Training (With Model Swapping)<br>
+### 3.3 Model Training (With Model Swapping)<br>
 You can train models using the default settings in config.json or swap algorithms directly using command-line arguments.<br>
 <br>
 **<u>Option A: Train the Default Model (Random Forest)</u>**<br>
@@ -103,7 +103,7 @@ Output is saved to: models/gradientboostingregressor_model.pkl<br>
 
 
 
-## 3.4 Model Evaluation:<br>
+### 3.4 Model Evaluation:<br>
 Evaluate your trained models dynamically by passing matching command-line arguments.<br>
 <br>
 **<u>Evaluate Default Model (Random Forest):</u>**<br>
