@@ -27,6 +27,7 @@ student-score-prediction-aiap/
 ├── requirements.txt    # Python dependencies
 └── README.md           # Project documentation and usage instructions
 └── config.json         # central control file to change model settings
+└── run.sh              # run script to auto-execute pipeline
 ```
 
 ## 2. Instructions for Execution
