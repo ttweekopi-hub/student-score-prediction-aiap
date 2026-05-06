@@ -24,13 +24,30 @@ student-score-prediction-aiap/
 │   ├── preprocessing.py # Data ingestion, cleaning, and feature engineering
 │   ├── train.py         # Model training and pipeline serialization
 │   └── evaluation.py    # Performance metrics calculation
+│   └── utils.py         # Logging feature
 ├── requirements.txt    # Python dependencies
 └── README.md           # Project documentation and usage instructions
 └── config.json         # central control file to change model settings
 └── run.sh              # run script to auto-execute pipeline
+└── pipeline.log        # Generated automatically on script execution
 ```
 
-## 2. Instructions for Execution
+## 2. Logging & Pipeline Monitoring (Production Features)
+
+To align with robust software engineering practices, this pipeline completely avoids unformatted `print()` statements. Instead, it utilizes Python's native `logging` module to output standardized, traceable logs to both the console and a persistent log file.
+
+### Key Logging Configurations
+* **Timezone-Aware Timestamps:** All log entries are locked to **Singapore Standard Time (SGT, UTC+8)** using a custom timezone formatter. This ensures consistency regardless of whether the pipeline is executed locally, in a cloud VM, or on a grader's machine.
+* **Date & Time Format:** Timestamps follow the Singapore-localized date format: `DD-MM-YYYY HH:MM:SS SGT`.
+* **Multi-Destination Logging:** Logs are simultaneously streamed to the active console window (standard output) and appended to a centralized file.
+
+### File Structure & Output Destination
+Logs are stored in a centralized file located at the project root:
+```text
+my_project_root/
+└── pipeline.log             # Generated automatically on script execution
+
+## 3. Instructions for Execution
 
 This pipeline supports two execution methods: a **one-click automated runner** (recommended for quick grading) and **manual step-by-step commands** (designed for custom experiments and model-swapping).
 
@@ -52,16 +69,16 @@ This is the step-by-step execution option for running the pipeline.  It is highl
 
 **Ensure you have the *score.db* file downloaded and placed in the data/ folder before starting.**<br>
 
-## 2.1. Install Dependencies:<br>
+## 3.1. Install Dependencies:<br>
     pip install -r requirements.txt
 
-## 2.2 Run Preprocessing:<br>
+## 3.2 Run Preprocessing:<br>
 This fetches data via SQLite, cleans features, and performs feature engineering.<br>
 
 
     python src/preprocessing.py
 
-## 2.3 Model Training (With Model Swapping)<br>
+## 3.3 Model Training (With Model Swapping)<br>
 You can train models using the default settings in config.json or swap algorithms directly using command-line arguments.<br>
 <br>
 **<u>Option A: Train the Default Model (Random Forest)</u>**<br>
@@ -84,7 +101,7 @@ Output is saved to: models/gradientboostingregressor_model.pkl<br>
 
 
 
-## 2.4 Model Evaluation:<br>
+## 3.4 Model Evaluation:<br>
 Evaluate your trained models dynamically by passing matching command-line arguments.<br>
 <br>
 **<u>Evaluate Default Model (Random Forest):</u>**<br>
@@ -101,7 +118,7 @@ Evaluate your trained models dynamically by passing matching command-line argume
 
 All evaluation will output the final RMSE and R² scores.
 
-## 3. Pipeline flow and Logical Steps
+## 4. Pipeline flow and Logical Steps
 
 The pipeline follows a sequential flow from raw data to evaluation:
 
@@ -115,7 +132,7 @@ The pipeline follows a sequential flow from raw data to evaluation:
 
 5. **Serialization**: Saves the entire pipeline (preprocessor + model) as a single object for reusability.
 
-## 4. Key EDA findings & Feature Processing
+## 5. Key EDA findings & Feature Processing
 
 ### Findings Summary
 - **Attendance & Study Hours**: Strongest positive correlation with test scores.<br>
@@ -130,7 +147,7 @@ The pipeline follows a sequential flow from raw data to evaluation:
 | `sleep_time` | String | Combined into `sleep_duration` | Convert raw time to usable duration. |
 | `attendance_rate` | Numerical | Imputed with Median | Handle missing values without dropping rows. |
 
-## 5. Choice of Model and Evaluation
+## 6. Choice of Model and Evaluation
 
 To promote easy experimentation, all model training configurations are centralized. The workflow can be fine-tuned using the following parameters:<br>
 <br>
@@ -158,7 +175,7 @@ The *config.json* file controls directories, database targets, column modificati
 }
 ```
 
-## 6. Choice of Evaluated Algorithms: <br>
+## 7. Choice of Evaluated Algorithms: <br>
 
 **<u>Random Forest Regressor (Default Ensemble Model)</u>**<br>
 *Why Chosen*: Excellent at capturing complex interaction thresholds in student habits (such as the non-linear relationship where score performance drops sharply below 7 hours of sleep).
@@ -171,7 +188,7 @@ The *config.json* file controls directories, database targets, column modificati
 **<u>Linear Regression (Baseline Parametric Model)</u>**<br>
 *Why Chosen*: Serves as a vital baseline to quantify the performance boost gained by transitioning to non-linear tree-based models.
 
-## 7. Model Evaluation Results (Test Set Evaluation)
+## 8. Model Evaluation Results (Test Set Evaluation)
 
 To ensure strict validation and prevent data leakage, all models are evaluated **solely on an unseen test set partition (20% split)**. The project success criterion is established at a **Mean Absolute Error (MAE) < 6.0 marks** to ensure predictions are tight enough to provide reliable, actionable early interventions for school educators.
 
