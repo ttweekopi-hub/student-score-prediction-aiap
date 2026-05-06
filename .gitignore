@@ -5,6 +5,10 @@ __pycache__/
 venv/
 .venv/
 
+# --- Jupyter Notebook Backups ---
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
+
 # --- IDE Settings (PyCharm, VS Code) ---
 .idea/
 .vscode/
