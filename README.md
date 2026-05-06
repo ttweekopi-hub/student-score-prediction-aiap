@@ -88,13 +88,13 @@ Output is saved to: models/student_model.pkl (as specified in config.json)<br>
 Overrides the default model from the terminal. This automatically resets the hyperparameters to suit a linear baseline.<br>
 Output is saved to: models/LinearRegression_model.pkl<br>
 
-    python -m src.train --model LinearRegression
+    python -m src.train --model lr
 
 
 **<u>Option C: Train a Gradient Boosting Regressor</u>**<br>
 Output is saved to: models/gradientboostingregressor_model.pkl<br>
 
-    python -m src.train --model GradientBoostingRegressor
+    python -m src.train --model gbr
 
 
 
@@ -107,11 +107,11 @@ Evaluate your trained models dynamically by passing matching command-line argume
 
 **<u>Evaluate Linear Regression:</u>**
 
-    python -m src.evaluation --model LinearRegression
+    python -m src.evaluation --model lr
 
 **<u>Evaluate Gradient Boosting:</u>**<br>
 
-    python -m src.evaluation --model GradientBoostingRegressor
+    python -m src.evaluation --model gbr
 
 All evaluation will output the final RMSE and R² scores.
 
@@ -193,22 +193,60 @@ To ensure strict validation and prevent data leakage, all models are evaluated *
 
 | Model | Evaluation Command Override | RMSE | MAE | R² Score | Target (MAE < 6.0) | Status |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Random Forest** | *Default (no flag)* | **7.9057** | **5.8297** | **0.6780** | **Met** | **Selected Model** |
-| **Gradient Boosting** | `--model GradientBoostingRegressor` | 8.2876 | 6.3934 | 0.6462 | Failed | Rejected |
-| **Linear Regression** | `--model LinearRegression` | 10.0892 | 8.0855 | 0.4756 | Failed | Rejected |
+| **Random Forest** | *Default (no flag)* | **7.9027** | **5.7672** | **0.6783** | **Met** | **Selected Model** |
+| **Gradient Boosting** | `--model gbr` | 8.2750 | 6.3895 | 0.6472 | Failed | Rejected |
+| **Linear Regression** | `--model lr` | 10.0943 | 8.0861 | 0.4751 | Failed | Rejected |
 
 ### Technical Analysis & Insights
 
-1. **Why the Random Forest Won (MAE: 5.83 marks, R²: 0.6780):**
-   The Random Forest Regressor successfully met the acceptance criteria of < 6 MAE score. It explains **67.8% of the variance** on unseen data, keeping predictions within an average margin of **$\pm$ 5.8 marks**. This high precision allows teachers to confidently identify at-risk students who need remedial help without suffering from excessive false alarms.
+1. **Why the Random Forest Won (MAE: 5.76 marks, R²: 0.6783):**
+   The Random Forest Regressor successfully met the acceptance criteria of < 6 MAE score. It explains **67.8% of the variance** on unseen data, keeping predictions within an average margin of **$\pm$ 5.7 marks**. This high precision allows teachers to confidently identify at-risk students who need remedial help without suffering from excessive false alarms.
 
-2. **Why the Linear Model Struggled (MAE: 8.09 marks, R²: 0.4756):**
-   Linear Regression left more than 52% of the variance unexplained. Because it is forced to fit relationships to a straight line, it cannot model non-linear boundaries. For example, losing an hour of sleep does not degrade performance linearly; instead, performance drops sharply past the 7-hour threshold. Linear Regression averages these trends out, resulting in a much wider margin of error ($\pm$ 8.1 marks) which is too loose for practical school intervention.
+2. **Why the Linear Model Struggled (MAE: 8.08 marks, R²: 0.4751):**
+   Linear Regression left more than 52% of the variance unexplained. Because it is forced to fit relationships to a straight line, it cannot model non-linear boundaries. For example, losing an hour of sleep does not degrade performance linearly; instead, performance drops sharply past the 7-hour threshold. Linear Regression averages these trends out, resulting in a much wider margin of error ($\pm$ 8.0 marks) which is too loose for practical school intervention.
 
-3. **Why Gradient Boosting Fell Behind Random Forest (MAE: 6.39 marks, R²: 0.6462):**
+3. **Why Gradient Boosting Fell Behind Random Forest (MAE: 6.38 marks, R²: 0.6472):**
    While Gradient Boosting is highly capable, its sequential optimization was slightly more sensitive to noise in the categorical indicators (such as tuition and CCA types) compared to the parallel, variance-reducing nature of Random Forest's bootstrap aggregation (bagging).
 
 ### Explanation of Evaluation Metrics
 * **MAE (Mean Absolute Error):** Chosen as our primary business metric because it represents the average prediction error in physical units (marks). An MAE of 5.83 means our predictions are, on average, within 5.8 marks of the student's true O-level score.
 * **RMSE (Root Mean Squared Error):** Chosen to penalize larger prediction errors more heavily. Our winning model's RMSE of 7.91 indicates that we have managed to keep large, outlier prediction errors to a minimum.
 * **R² (Coefficient of Determination):** Measures the proportion of variance in O-level math scores that our features can predict.
+
+### Feature Importance Analysis (Random Forest)
+
+| Rank | Feature / Predictive Factor | Relative Influence (%) |
+| :---: | :--- | :---: |
+| 1 | Number of Siblings | 27.18% |
+| 2 | Hours Studied per Week | 19.42% |
+| 3 | Attendance Rate | 16.48% |
+| 4 | Direct Admission (Yes) | 9.46% |
+| 5 | Class Gender Ratio (Number of Males) | 8.61% |
+| 6 | Co-Curricular Activity: None | 5.38% |
+| 7 | Learning Style: Visual | 4.36% |
+| 8 | Extra Tuition (Yes) | 4.10% |
+| 9 | Student Age | 1.64% |
+| 10 | Gender: Male | 1.19% |
+| 11 | Co-Curricular Activity: Clubs | 0.87% |
+| 12 | Co-Curricular Activity: Sports | 0.80% |
+| 13 | Sleep Duration | 0.50% |
+
+### Feature Importance Analysis (Gradient Boosting Regressor)
+
+| Rank | Feature / Predictive Factor | Relative Influence (%) |
+| :---: | :--- | :---: |
+| 1 | Number of Siblings | 31.09% |
+| 2 | Hours Studied per Week | 19.43% |
+| 3 | Attendance Rate | 13.80% |
+| 4 | Co-Curricular Activity: None | 11.21% |
+| 5 | Direct Admission (Yes) | 9.67% |
+| 6 | Extra Tuition (Yes) | 6.93% |
+| 7 | Learning Style: Visual | 5.33% |
+| 8 | Class Gender Ratio (Number of Males) | 2.28% |
+| 9 | Sleep Duration | 0.10% |
+| 10 | Gender: Male | 0.08% |
+| 11 | Student Age | 0.04% |
+| 12 | Co-Curricular Activity: Clubs | 0.02% |
+| 13 | Co-Curricular Activity: Sports | 0.01% |
+
+Linear Regression model does not natively support feature importances.

@@ -1,18 +1,40 @@
-import pandas as pd # Data manipulation
-import joblib # To load the saved model
-from sklearn.metrics import mean_squared_error, r2_score # Metrics
-from sklearn.model_selection import train_test_split # To split out the test set
-import numpy as np # For square root calculation
-import json # Config parser
-import argparse # For parsing command line arguments
+import pandas as pd  # Data manipulation
+import joblib  # To load the saved model
+from sklearn.metrics import mean_squared_error, r2_score  # Metrics
+from sklearn.model_selection import train_test_split  # To split out the test set
+import numpy as np  # For square root calculation
+import json  # Config parser
+import argparse  # For parsing command line arguments
 from sklearn.metrics import mean_absolute_error
-from src.utils import setup_logger  # <--- IMPORT THE LOGGER HELPER
+from src.utils import setup_logger  # Import the timezone-locked logger
 
 # Initialize the logger for the evaluation module
 logger = setup_logger("evaluation")
 
+# Define the user-friendly command line nicknames mapped to full scikit-learn classes
+MODEL_ALIASES = {
+    "lr": "LinearRegression",
+    "rf": "RandomForestRegressor",
+    "gbm": "GradientBoostingRegressor",
+    "gbr": "GradientBoostingRegressor",
+    "svr": "SVR"
+}
+
 def load_config(config_path="config.json"):
-    """Loads the pipeline configuration parameters from a JSON file."""
+    """Loads the pipeline configuration parameters from a JSON file.
+
+    Args:
+        config_path (str, optional): Relative path to the configuration JSON file. 
+            Defaults to "config.json".
+
+    Returns:
+        dict: A nested dictionary containing data ingestion, preprocessing, 
+            and modeling configurations.
+
+    Raises:
+        FileNotFoundError: If the specified configuration file does not exist.
+        json.JSONDecodeError: If the configuration file is not valid JSON.
+    """
     try:
         with open(config_path, "r") as f:
             return json.load(f)
@@ -21,7 +43,20 @@ def load_config(config_path="config.json"):
         raise
 
 def evaluate_model():
-    """Evaluates a trained model pipeline on the unseen test set partition."""
+    """Evaluates a trained model pipeline on the unseen test set partition.
+
+    This function isolates the validation split (the same 20% validation split 
+    defined during training), restores the serialized preprocessor/model pipeline,
+    evaluates performance metrics (RMSE, MAE, R2), and outputs a sorted 
+    Feature Importance leaderboard to provide stakeholder interpretability.
+
+    Returns:
+        None: Logs output metrics directly to the console and appends to the log file.
+
+    Raises:
+        FileNotFoundError: If the cleaned CSV dataset or the saved model binary 
+            cannot be resolved at their defined destinations.
+    """
     logger.info("=========================================")
     logger.info("        Evaluating Model Pipeline        ")
     logger.info("=========================================")
@@ -31,7 +66,7 @@ def evaluate_model():
     parser.add_argument(
         '--model', 
         type=str, 
-        help="Override the model to evaluate (e.g., RandomForestRegressor, LinearRegression)"
+        help="Override the model to evaluate using its name or alias (e.g., lr, rf, gbm, svr)"
     )
     args = parser.parse_args()
 
@@ -40,7 +75,15 @@ def evaluate_model():
 
     # 3. Determine the model path to load
     if args.model:
-        model_path = f"models/{args.model.lower()}_model.pkl"
+        # Resolve command line alias to find correct .pkl filename
+        user_input = args.model.lower()
+        if user_input in MODEL_ALIASES:
+            algorithm = MODEL_ALIASES[user_input]
+            logger.info(f"Resolved evaluation alias '{args.model}' to '{algorithm}'.")
+        else:
+            algorithm = args.model  # Fallback to literal entry if user typed the full class name
+            
+        model_path = f"models/{algorithm.lower()}_model.pkl"
         logger.info(f"Targeting custom CLI model: {model_path}")
     else:
         model_path = config["model"]["save_path"]
@@ -48,7 +91,7 @@ def evaluate_model():
 
     # 4. Load the cleaned data
     try:
-        df = pd.read_csv(config["data"]["cleaned_csv_path"])
+        df = pd.read_csv(config["data"]["cleaned_csv_path"], keep_default_na=False)
     except FileNotFoundError as e:
         logger.error(f"Cleaned dataset not found at '{config['data']['cleaned_csv_path']}'. Run preprocessing first. Error: {e}")
         return
@@ -81,11 +124,53 @@ def evaluate_model():
     r2 = r2_score(y_test, predictions)
     mae = mean_absolute_error(y_test, predictions)
 
-    # 10. Display the results using logger.info to save to pipeline.log as well!
+    # 10. Display and save performance metrics
     logger.info("Evaluation complete. Logging final performance metrics:")
     logger.info(f"   >>> RMSE:     {rmse:.4f} marks")
     logger.info(f"   >>> MAE:      {mae:.4f} marks")
     logger.info(f"   >>> R2 Score: {r2:.4f}")
+
+    # 11. Extract and Print Feature Importance for Interpretability
+    logger.info("=========================================")
+    logger.info("       Feature Importance Analysis       ")
+    logger.info("=========================================")
+    
+    try:
+        preprocessor = model.named_steps['preprocessor']
+        regressor = model.named_steps['regressor']
+        
+        # Verify if estimator supports feature importance attributes
+        if hasattr(regressor, 'feature_importances_'):
+            feature_names = []
+            
+            # Map structural transformer columns back to their post-transformed names
+            for name, transformer, columns in preprocessor.transformers_:
+                if name == 'cat':
+                    cat_features = transformer.get_feature_names_out(columns)
+                    feature_names.extend(cat_features)
+                elif name == 'remainder':
+                    feature_names.extend(columns)
+            
+            # Fallback in case columns map mismatch
+            if not feature_names or len(feature_names) != len(regressor.feature_importances_):
+                feature_names = [f"Feature {i}" for i in range(len(regressor.feature_importances_))]
+
+            # Pack, sort, and log structural importance
+            importances = regressor.feature_importances_
+            feature_importance_list = sorted(
+                zip(feature_names, importances), 
+                key=lambda x: x[1], 
+                reverse=True
+            )
+            
+            logger.info("Relative influence of factors on student final score:")
+            for rank, (feature, importance) in enumerate(feature_importance_list, 1):
+                logger.info(f"   {rank}. {feature:<25} : {importance * 100:>6.2f}%")
+        else:
+            logger.warning(f"The model '{type(regressor).__name__}' does not natively support feature importances.")
+            
+    except Exception as e:
+        logger.error(f"Could not extract feature importances: {e}")
 
 if __name__ == "__main__":
     evaluate_model()

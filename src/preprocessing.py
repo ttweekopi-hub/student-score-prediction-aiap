@@ -82,6 +82,9 @@ def process_data(df, config):
     """Cleans, transforms, and prepares raw data for training and evaluation."""
     logger.info("Starting data preprocessing...")
     
+    # Clean and standardize all Column Names (e.g. "CCA " -> "CCA")
+    df.columns = df.columns.str.strip()
+    
     # 1. Drop rows where target variable is missing
     target = config["data"]["target_column"]
     initial_len = len(df)
@@ -102,9 +105,23 @@ def process_data(df, config):
         df['tuition'] = df['tuition'].replace({'Y': 'Yes', 'N': 'No'})
         
     if 'CCA' in df.columns:
-        logger.info("Standardizing categorical representations for 'CCA'.")
-        df['CCA'] = df['CCA'].replace({'NONE': 'None'})
-    
+        logger.info("Standardizing categorical representations for 'CCA'...")
+        
+        # 1. Convert to string, make Title Case, and strip hidden spaces (e.g. " Clubs " -> "Clubs")
+        df['CCA'] = df['CCA'].astype(str).str.strip().str.title()
+        
+        # 2. Standardize all variations of "None" and string "Nan" representations to a unified "None"
+        logger.info("Normalizing null and missing string variations to 'None'.")
+        df['CCA'] = df['CCA'].replace({
+            'None': 'None',
+            'Nan': 'None',
+            '<Null>': 'None',  # In case the database has literal null text
+            '': 'None'         # In case there are empty strings
+        })
+        
+        # 3. Safety Net: Fill any actual pandas NaN values that somehow survived string conversion
+        df['CCA'] = df['CCA'].fillna('None')
+
     # 4. Feature Engineering: Sleep Duration
     if 'sleep_time' in df.columns and 'wake_time' in df.columns:
         logger.info("Engineering feature: 'sleep_duration' from raw sleep/wake timestamps.")
