@@ -9,9 +9,6 @@ I have selected to use the "Student Score Prediction" case study from the Past Y
 
 The pipeline is designed to predict final mathematics scores using student demographic and academic indicators to proactively identify at-risk individuals. The system targets an MAE below 6.0 marks (≤6% error on a 100-point scale), balancing predictive accuracy with interpretability for practical educational intervention. This threshold was selected because errors within ±6 marks preserve meaningful distinction between performance bands while remaining actionable for identifying at-risk students.
 
-The sqlite db (score.db) used in this ML pipeline can be downloaded from here:
-https://techassessment.blob.core.windows.net/aiap-preparatory-bootcamp/score.db
-
 ### Project Structure
 
 ```text
