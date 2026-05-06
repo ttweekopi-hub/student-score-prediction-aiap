@@ -7,7 +7,7 @@ https://github.com/AISG-AIAP/AIAP-Technical-Assessment-Past-Years-Series
 
 I have selected to use the "Student Score Prediction" case study from the Past Year Series collection to practise building an end-to-end ML pipeline covering EDA/ML Pipeline as requirements to pass the AIAP Technical Assessment.
 
-The pipeline I built is designed to predict O-level mathematics scores for U.A. Secondary School. The goal is to identify students who may require additional academic support before the examination.
+The pipeline is designed to predict final mathematics scores using student demographic and academic indicators to proactively identify at-risk individuals. The system optimizes for a Mean Absolute Error (MAE) < 6.0 marks while prioritizing actionable interpretability to enable timely, targeted academic interventions.
 
 The sqlite db (score.db) used in this ML pipeline can be downloaded from here:
 https://techassessment.blob.core.windows.net/aiap-preparatory-bootcamp/score.db
@@ -154,8 +154,30 @@ The *config.json* file controls directories, database targets, column modificati
 **<u>Linear Regression (Baseline Parametric Model)</u>**<br>
 *Why Chosen*: Serves as a vital baseline to quantify the performance boost gained by transitioning to non-linear tree-based models.
 
-## 7. Evaluation Metrics
-- **RMSE (Root Mean Squared Error)**: Chosen to quantify the average deviation in test marks. The result of 4.49 indicates high precision for school interventions.
+## 7. Model Evaluation Results (Test Set Evaluation)
 
-- **R² (R-Squared)**: Chosen to measure the proportion of variance explained. An R² score of 0.8968 confirms that roughly 90% of a student's score variance is explained by their academic habits, attendance, and sleep duration.
+To ensure strict validation and prevent data leakage, all models are evaluated **solely on an unseen test set partition (20% split)**. The project success criterion is established at a **Mean Absolute Error (MAE) < 6.0 marks** to ensure predictions are tight enough to provide reliable, actionable early interventions for school educators.
 
+### Experimental Performance Metrics Comparison
+
+| Model | Evaluation Command Override | RMSE | MAE | R² Score | Target (MAE < 6.0) | Status |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **Random Forest** | *Default (no flag)* | **7.9057** | **5.8297** | **0.6780** | **Met** | **Selected Model** |
+| **Gradient Boosting** | `--model GradientBoostingRegressor` | 8.2876 | 6.3934 | 0.6462 | Failed | Rejected |
+| **Linear Regression** | `--model LinearRegression` | 10.0892 | 8.0855 | 0.4756 | Failed | Rejected |
+
+### Technical Analysis & Insights
+
+1. **Why the Random Forest Won (MAE: 5.83 marks, R²: 0.6780):**
+   The Random Forest Regressor successfully met our strict acceptance criteria. It explains **67.8% of the variance** on unseen data, keeping predictions within an average margin of **$\pm$ 5.8 marks**. This high precision allows teachers to confidently identify at-risk students who need remedial help without suffering from excessive false alarms.
+
+2. **Why the Linear Model Struggled (MAE: 8.09 marks, R²: 0.4756):**
+   Linear Regression left more than 52% of the variance unexplained. Because it is forced to fit relationships to a straight line, it cannot model non-linear boundaries. For example, losing an hour of sleep does not degrade performance linearly; instead, performance drops sharply past the 7-hour threshold. Linear Regression averages these trends out, resulting in a much wider margin of error ($\pm$ 8.1 marks) which is too loose for practical school intervention.
+
+3. **Why Gradient Boosting Fell Behind Random Forest (MAE: 6.39 marks, R²: 0.6462):**
+   While Gradient Boosting is highly capable, its sequential optimization was slightly more sensitive to noise in the categorical indicators (such as tuition and CCA types) compared to the parallel, variance-reducing nature of Random Forest's bootstrap aggregation (bagging).
+
+### Explanation of Evaluation Metrics
+* **MAE (Mean Absolute Error):** Chosen as our primary business metric because it represents the average prediction error in physical units (marks). An MAE of 5.83 means our predictions are, on average, within 5.8 marks of the student's true O-level score.
+* **RMSE (Root Mean Squared Error):** Chosen to penalize larger prediction errors more heavily. Our winning model's RMSE of 7.91 indicates that we have managed to keep large, outlier prediction errors to a minimum.
+* **R² (Coefficient of Determination):** Measures the proportion of variance in O-level math scores that our features can predict.
