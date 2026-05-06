@@ -4,6 +4,7 @@ from datetime import datetime # Date/Time operations
 import json # To read the configuration file
 from src.utils import setup_logger  # <--- IMPORT THE LOGGER HELPER
 import os
+import urllib.request  # Native python library to download files
 
 # Initialize the logger for the preprocessing step
 logger = setup_logger("preprocessing")
@@ -33,6 +34,10 @@ def load_config(config_path="config.json"):
 def load_data(db_path):
     """Establishes a connection to the SQLite database and loads raw student data.
 
+    If the database file is not found at the specified path, this function 
+    attempts to dynamically download the database from a remote hosting URL 
+    to ensure automated pipeline execution does not fail.
+
     Args:
         db_path (str): Relative path to the SQLite database file containing the raw data.
 
@@ -40,18 +45,37 @@ def load_data(db_path):
         pd.DataFrame: A pandas DataFrame holding the raw records from the 'score' table.
 
     Raises:
+        FileNotFoundError: If the local database is missing and the remote download fails.
         sqlite3.Error: If a database connection error or query execution failure occurs.
     """
+    # Check if the database file is missing
+    if not os.path.exists(db_path):
+        logger.warning(f"Database not found at '{db_path}'.")
+        
+        # Define your public raw database download link here (if you have one)
+        download_url = "https://techassessment.blob.core.windows.net/aiap-preparatory-bootcamp/score.db" 
+        
+        try:
+            logger.info(f"Attempting to download raw database from {download_url}...")
+            # Ensure the data/ directory exists
+            os.makedirs(os.path.dirname(db_path), exist_ok=True)
+            # Download the file
+            urllib.request.urlretrieve(download_url, db_path)
+            logger.info("Download complete!")
+        except Exception as e:
+            logger.error(f"Failed to auto-download database: {e}")
+            logger.error("Please manually copy 'score.db' into the 'data/' folder.")
+            raise FileNotFoundError(f"Database missing at {db_path} and download failed.")
+
+    # Proceed with loading database
     try:
-        logger.info(f"Connecting to raw database at: {db_path}")
         conn = sqlite3.connect(db_path)
         query = "SELECT * FROM score"
         df = pd.read_sql_query(query, conn)
         conn.close()
-        logger.info(f"Successfully loaded {len(df)} raw records from database.")
         return df
     except sqlite3.Error as e:
-        logger.error(f"Database connection or query failed: {e}")
+        logger.error(f"Failed to query the database table: {e}")
         raise
 
 def process_data(df, config):
