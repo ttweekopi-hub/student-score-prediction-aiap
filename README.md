@@ -47,7 +47,8 @@ Logs are stored in a centralized file located at the project root:
 my_project_root/
 └── pipeline.log             # Generated automatically on script execution
 ```
-<br>
+
+
 ## 3. Instructions for Execution
 
 This pipeline supports two execution methods: a **one-click automated runner** (recommended for quick grading) and **manual step-by-step commands** (designed for custom experiments and model-swapping).
