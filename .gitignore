@@ -1,14 +1,24 @@
-# Python artifacts
+# --- Python Artifacts ---
 __pycache__/
 *.py[cod]
-
-# Data files (Don't upload the database or huge CSVs)
-data/score.db
-
-# Virtual environments
+*$py.class
 venv/
-.env
+.venv/
 
-# MacOS/Windows noise
-.DS_Store
-Thumbs.db
+# --- IDE Settings (PyCharm, VS Code) ---
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# --- Data & Output Artifacts ---
+# Ignore all CSV files generated inside the data folder
+data/*.csv
+
+# Ignore all serialized models in the models folder
+models/*.pkl
+
+# Ignore local runtime logs
+pipeline.log
