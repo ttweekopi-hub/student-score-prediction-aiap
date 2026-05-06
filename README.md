@@ -67,9 +67,8 @@ chmod +x run.sh
 ```
 ### Option B: Step-by-Step Execution (For Custom Experimentation)
 
-This is the alternative execution option for running the pipeline.  It is highly configurable (unlike the one-click automated option which runs just our best recommended Random Forest model) and supports execution with different machine learning algorithms and parameters using a combination of a configuration file (`config.json`) and command-line interface (CLI) parameter overrides.
-
-**Ensure you have the *score.db* file downloaded and placed in the data/ folder before starting.**<br>
+This is the alternative execution option for running the pipeline.  It is highly configurable (unlike the one-click automated option which runs just our best recommended Random Forest model) and supports execution with different machine learning algorithms and parameters using a combination of a configuration file (`config.json`) and command-line interface (CLI) parameter overrides.<br>
+Run all terminal commands from the root folder of the cloned repository.
 
 ### 3.1. Install Dependencies:<br>
     pip install -r requirements.txt
