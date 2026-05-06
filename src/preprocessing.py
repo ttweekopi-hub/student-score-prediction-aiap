@@ -3,6 +3,7 @@ import sqlite3 # Database connection
 from datetime import datetime # Date/Time operations
 import json # To read the configuration file
 from src.utils import setup_logger  # <--- IMPORT THE LOGGER HELPER
+import os
 
 # Initialize the logger for the preprocessing step
 logger = setup_logger("preprocessing")
