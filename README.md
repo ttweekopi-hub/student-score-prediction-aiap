@@ -67,7 +67,7 @@ chmod +x run.sh
 ```
 ### Option B: Step-by-Step Execution (For Custom Experimentation)
 
-This is the step-by-step execution option for running the pipeline.  It is highly configurable (unlike the one-click automated option which runs just our best recommended Random Forest model) and supports execution with different machine learning algorithms and parameters using a combination of a configuration file (`config.json`) and command-line interface (CLI) parameter overrides.
+This is the alternative execution option for running the pipeline.  It is highly configurable (unlike the one-click automated option which runs just our best recommended Random Forest model) and supports execution with different machine learning algorithms and parameters using a combination of a configuration file (`config.json`) and command-line interface (CLI) parameter overrides.
 
 **Ensure you have the *score.db* file downloaded and placed in the data/ folder before starting.**<br>
 
@@ -77,8 +77,7 @@ This is the step-by-step execution option for running the pipeline.  It is highl
 ### 3.2 Run Preprocessing:<br>
 This fetches data via SQLite, cleans features, and performs feature engineering.<br>
 
-
-    python src/preprocessing.py
+    python -m src.preprocessing
 
 ### 3.3 Model Training (With Model Swapping)<br>
 You can train models using the default settings in config.json or swap algorithms directly using command-line arguments.<br>
@@ -87,19 +86,19 @@ You can train models using the default settings in config.json or swap algorithm
 This runs using the default hyperparameters and configuration specified inside config.json.<br>
 Output is saved to: models/student_model.pkl (as specified in config.json)<br>
     
-    python src/train.py
+    python -m src.train
 
 **<u>Option B: Train a Linear Regression Baseline</u>**<br>
 Overrides the default model from the terminal. This automatically resets the hyperparameters to suit a linear baseline.<br>
 Output is saved to: models/LinearRegression_model.pkl<br>
 
-    python src/train.py --model LinearRegression
+    python -m src.train --model LinearRegression
 
 
 **<u>Option C: Train a Gradient Boosting Regressor</u>**<br>
 Output is saved to: models/gradientboostingregressor_model.pkl<br>
 
-    python src/train.py --model GradientBoostingRegressor
+    python -m src.train --model GradientBoostingRegressor
 
 
 
@@ -108,15 +107,15 @@ Evaluate your trained models dynamically by passing matching command-line argume
 <br>
 **<u>Evaluate Default Model (Random Forest):</u>**<br>
 
-    python src/evaluation.py
+    python -m src.evaluation
 
 **<u>Evaluate Linear Regression:</u>**
 
-    python src/evaluation.py --model LinearRegression
+    python -m src.evaluation --model LinearRegression
 
 **<u>Evaluate Gradient Boosting:</u>**<br>
 
-    python src/evaluation.py --model GradientBoostingRegressor
+    python -m src.evaluation --model GradientBoostingRegressor
 
 All evaluation will output the final RMSE and R² scores.
 
@@ -205,7 +204,7 @@ To ensure strict validation and prevent data leakage, all models are evaluated *
 ### Technical Analysis & Insights
 
 1. **Why the Random Forest Won (MAE: 5.83 marks, R²: 0.6780):**
-   The Random Forest Regressor successfully met our strict acceptance criteria. It explains **67.8% of the variance** on unseen data, keeping predictions within an average margin of **$\pm$ 5.8 marks**. This high precision allows teachers to confidently identify at-risk students who need remedial help without suffering from excessive false alarms.
+   The Random Forest Regressor successfully met the acceptance criteria of < 6 MAE score. It explains **67.8% of the variance** on unseen data, keeping predictions within an average margin of **$\pm$ 5.8 marks**. This high precision allows teachers to confidently identify at-risk students who need remedial help without suffering from excessive false alarms.
 
 2. **Why the Linear Model Struggled (MAE: 8.09 marks, R²: 0.4756):**
    Linear Regression left more than 52% of the variance unexplained. Because it is forced to fit relationships to a straight line, it cannot model non-linear boundaries. For example, losing an hour of sleep does not degrade performance linearly; instead, performance drops sharply past the 7-hour threshold. Linear Regression averages these trends out, resulting in a much wider margin of error ($\pm$ 8.1 marks) which is too loose for practical school intervention.
