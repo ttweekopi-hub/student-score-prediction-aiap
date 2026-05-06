@@ -175,7 +175,7 @@ The *config.json* file controls directories, database targets, column modificati
 ## 7. Choice of Evaluated Algorithms: <br>
 
 **<u>Random Forest Regressor (Default Ensemble Model)</u>**<br>
-*Why Chosen*: Excellent at capturing complex interaction thresholds in student habits (such as the non-linear relationship where score performance drops sharply below 7 hours of sleep).
+*Why Chosen*: Excellent at capturing complex interaction thresholds in student habits (such as the non-linear relationship of the high importance of a lack of CCA vs. the low importance of specific CCAs).
 <br>
 *Strengths*: Extremely robust against multi-modal distributions and requires no scaling.<br>
 <br>
