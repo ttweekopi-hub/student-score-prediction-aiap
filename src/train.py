@@ -10,11 +10,41 @@ from sklearn.pipeline import Pipeline # Pipeline builder
 import importlib # Used to load any sklearn class dynamically
 
 def load_config(config_path="config.json"):
+    """Loads the pipeline configuration parameters from a JSON file.
+
+    Args:
+        config_path (str, optional): Relative path to the configuration JSON file. 
+            Defaults to "config.json".
+
+    Returns:
+        dict: A nested dictionary containing data ingestion, preprocessing, 
+            and modeling configurations.
+
+    Raises:
+        FileNotFoundError: If the specified configuration file does not exist.
+        json.JSONDecodeError: If the configuration file is not valid JSON.
+    """
     with open(config_path, "r") as f:
         return json.load(f)
 
 def get_regressor(algorithm_name, params):
-    """Dynamically imports and instantiates an sklearn model class."""
+    """Dynamically imports and instantiates an scikit-learn regressor class.
+
+    This enables the pipeline to support multiple algorithms (e.g., Random Forest,
+    Gradient Boosting, Linear Regression) without hardcoding imports.
+
+    Args:
+        algorithm_name (str): The exact class name of the scikit-learn regressor 
+            (e.g., "RandomForestRegressor").
+        params (dict): A dictionary of hyperparameters to instantiate the model with.
+
+    Returns:
+        RegressorMixin: An initialized scikit-learn regressor instance.
+        
+    Raises:
+        ModuleNotFoundError: If the module associated with the algorithm name cannot be found.
+        AttributeError: If the class name does not exist within the imported module.
+    """
     modules = {
         "RandomForestRegressor": "sklearn.ensemble",
         "GradientBoostingRegressor": "sklearn.ensemble",
@@ -32,25 +62,27 @@ if __name__ == "__main__":
     parser.add_argument(
         '--model', 
         type=str, 
-        help="Override the model to use (e.g., RandomForestRegressor, LinearRegression, GradientBoostingRegressor)"
+        help="Override the default model algorithm (e.g., LinearRegression, GradientBoostingRegressor)"
     )
     args = parser.parse_args()
 
-    # 2. Load the base JSON config
-    config = load_config() 
-    
-    # 3. Handle Command Line Overrides
-    algorithm = config["model"]["algorithm"]
-    params = config["model"]["parameters"]
-    save_path = config["model"]["save_path"]
+    # 2. Load basic configurations
+    config = load_config()
 
+    # Determine algorithm and parameters
     if args.model:
-        print(f"⚠️ Command Line Override Active: Switching from {algorithm} to {args.model}")
+        # CLI Override logic
         algorithm = args.model
-        # Reset parameters if we swap models, as parameters for RF won't work on Linear Regression
-        params = {} 
-        # Update save path so we don't overwrite other model files
+        params = {"random_state": 42} if algorithm != "LinearRegression" else {}
+        print(f"CLI Override detected! Training model: {algorithm}")
+        # Create a unique path so we don't overwrite other model files
         save_path = f"models/{algorithm.lower()}_model.pkl"
+    else:
+        # Default Configuration logic
+        algorithm = config["model"]["algorithm"]
+        params = config["model"]["parameters"]
+        print(f"Loading default config. Training model: {algorithm}")
+        save_path = config["model"]["save_path"]
 
     # 4. Load cleaned data
     df = pd.read_csv(config["data"]["cleaned_csv_path"])
@@ -88,7 +120,7 @@ if __name__ == "__main__":
     save_dir = os.path.dirname(save_path)
     if save_dir and not os.path.exists(save_dir):
         os.makedirs(save_dir)
-        
-    # Serialize pipeline
+
+    # Save pipeline object (which contains the preprocessor AND the model)
     joblib.dump(model_pipeline, save_path)
-    print(f"Success! Model Training Complete ({algorithm}): Saved to {save_path}")
+    print(f"Model trained and saved successfully to: {save_path}")
