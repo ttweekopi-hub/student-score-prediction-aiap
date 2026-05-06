@@ -29,11 +29,27 @@ student-score-prediction-aiap/
 └── config.json         # central control file to change model settings
 ```
 
-## 2. Instructions for Execution & Parameter Modification
+## 2. Instructions for Execution
 
-The pipeline is highly configurable and supports execution with different machine learning algorithms and parameters using a combination of a configuration file (`config.json`) and command-line interface (CLI) parameter overrides.
+This pipeline supports two execution methods: a **one-click automated runner** (recommended for quick grading) and **manual step-by-step commands** (designed for custom experiments and model-swapping).
 
-To run the pipeline, ensure you have the *score.db* file downloaded and placed in the data/ folder.<br>
+### Option A: Quickstart (One-Click Automated Run)
+
+The repository includes a cross-platform pipeline runner script (`run.sh`). It automatically checks for the database, creates and isolates a virtual environment (`venv`), installs dependencies, runs preprocessing, trains the optimized Random Forest model, and runs the evaluation.
+
+#### For macOS / Linux / Git Bash (Windows):
+```bash
+# Grant execution permissions (Mac/Linux only)
+chmod +x run.sh
+
+# Execute the pipeline
+./run.sh
+```
+### Option B: Step-by-Step Execution (For Custom Experimentation)
+
+This is the step-by-step execution option for running the pipeline.  It is highly configurable (unlike the one-click automated option which runs just our best recommended Random Forest model) and supports execution with different machine learning algorithms and parameters using a combination of a configuration file (`config.json`) and command-line interface (CLI) parameter overrides.
+
+**Ensure you have the *score.db* file downloaded and placed in the data/ folder before starting.**<br>
 
 ## 2.1. Install Dependencies:<br>
     pip install -r requirements.txt
