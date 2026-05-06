@@ -1,6 +1,7 @@
 import pandas as pd # Data manipulation
 import joblib # To load the saved model
 from sklearn.metrics import mean_squared_error, r2_score # Metrics
+from sklearn.model_selection import train_test_split # NEW: To split out the test set
 import numpy as np # For square root calculation
 import json # Config parser
 import argparse # For parsing command line arguments
@@ -30,7 +31,7 @@ def evaluate_model():
         model_path = config["model"]["save_path"]
         print(f"Checking default model: {model_path}")
 
-    # 4. Load the cleaned evaluation data
+    # 4. Load the cleaned data
     try:
         df = pd.read_csv(config["data"]["cleaned_csv_path"])
     except FileNotFoundError:
@@ -42,24 +43,28 @@ def evaluate_model():
     X = df.drop(columns=[target])
     y = df[target]
 
-    # 6. Load the trained model pipeline
+    # 6. Split into Train and Test sets (using the exact same parameters as train.py)
+    # This isolates the test set to ensure we only evaluate on unseen data!
+    _, X_test, _, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # 7. Load the trained model pipeline
     try:
         model = joblib.load(model_path)
     except FileNotFoundError:
         print(f"Error: Could not find model at '{model_path}'. Did you train it first?")
         return
 
-    # 7. Make Predictions
-    predictions = model.predict(X)
+    # 8. Make Predictions on UNSEEN test data only
+    predictions = model.predict(X_test)
 
-    # 8. Calculate Metrics
-    mse = mean_squared_error(y, predictions)
+    # 9. Calculate Metrics using the actual test targets
+    mse = mean_squared_error(y_test, predictions)
     rmse = np.sqrt(mse)
-    r2 = r2_score(y, predictions)
+    r2 = r2_score(y_test, predictions)
 
-    # 9. Print the results
+    # 10. Print the results
     print("\n" + "="*40)
-    print(f"   Evaluation: {model_path.split('/')[-1]}")
+    print(f"   Evaluation (Test Set Only): {model_path.split('/')[-1]}")
     print("="*40)
     print(f" RMSE:     {rmse:.4f} marks")
     print(f" R2 Score: {r2:.4f}")
