@@ -1,7 +1,23 @@
 import logging
 import os
+import sys
 from datetime import datetime
+from pathlib import Path
 from zoneinfo import ZoneInfo
+
+# ==============================================================================
+# DYNAMIC PATH REGISTRATION (Resolves ModuleNotFoundError automatically!)
+# ==============================================================================
+# 1. Get the absolute path of the file running this code (src/utils.py)
+current_file = Path(__file__).resolve()
+
+# 2. Go one level up to find the project root folder (e.g., student-score-prediction-aiap)
+project_root = str(current_file.parent.parent)
+
+# 3. If the project root is not already in Python's search path, insert it
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+# ==============================================================================
 
 class SingaporeFormatter(logging.Formatter):
     """Custom logging formatter to force timestamps into Singapore Time (SGT)."""
@@ -24,7 +40,7 @@ class SingaporeFormatter(logging.Formatter):
         
         if datefmt:
             return sgt_dt.strftime(datefmt)
-        return sgt_dt.strftime('%d-%m-%Y %H:%M:%S') # Changed to DD-MM-YYYY format
+        return sgt_dt.strftime('%d-%m-%Y %H:%M:%S')
 
 def setup_logger(name, log_file="pipeline.log", level=logging.INFO):
     """Configures a cross-platform logger that outputs to both console and a file.
@@ -45,7 +61,6 @@ def setup_logger(name, log_file="pipeline.log", level=logging.INFO):
     if log_dir and not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-    # Updated format string to reflect %d-%m-%Y
     formatter = SingaporeFormatter(
         '%(asctime)s - %(name)s - %(levelname)s - %(message)s', 
         datefmt='%d-%m-%Y %H:%M:%S SGT'
