@@ -129,12 +129,7 @@ The pipeline follows a sequential flow from raw data to evaluation:
 
 5. **Serialization**: Saves the entire pipeline (preprocessor + model) as a single object for reusability.
 
-## 5. Key EDA findings & Feature Processing
-
-### Findings Summary
-- **Attendance & Study Hours**: Strongest positive correlation with test scores.<br>
-- **Tuition**: Significant performance boost for students with external tuition.<br>
-- **Sleep Threshold**: EDA revealed that students with <7 hours of sleep rarely score above 50.
+## 5. Feature Processing
 
 | Feature | Type | Processing Action | Reason |
 | :--- | :--- | :--- | :--- |
