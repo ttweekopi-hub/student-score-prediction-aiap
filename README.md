@@ -261,7 +261,8 @@ Several factors that intuitively seem important actually have **almost zero pred
 * **Specific CCAs (<1%):** While having *no* activity had some impact, whether a student chose Sports (0.18%) vs. Clubs (0.26%) does not meaningfully alter the prediction.
 
 
+
 ## Explanation of Evaluation Metrics
-* **MAE (Mean Absolute Error):** Chosen as our primary business metric because it represents the average prediction error in physical units (marks). An MAE of 5.76 means our predictions are, on average, within 5.7 marks of the student's true O-level score.
+* **MAE (Mean Absolute Error):** Chosen as our primary business metric because it represents the average prediction error in physical units (marks). An MAE of 5.83 means our predictions are, on average, within 5.8 marks of the student's true O-level score.
 * **RMSE (Root Mean Squared Error):** Chosen to penalize larger prediction errors more heavily. Our winning model's RMSE of 7.91 indicates that we have managed to keep large, outlier prediction errors to a minimum.
 * **R² (Coefficient of Determination):** Measures the proportion of variance in O-level math scores that our features can predict.

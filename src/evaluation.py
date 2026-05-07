@@ -145,7 +145,7 @@ def evaluate_model():
     elif test_r2 < 0.40:
         logger.warning("🚨 WARNING: Low predictive power detected! The model may be UNDERFITTING.")
     else:
-        logger.info("✅ Model generalization appears healthy (low variance between Train and Test performance).")
+        logger.info("✅ Model generalization appears acceptable with no immediate evidence of severe overfitting (low variance between Train and Test performance).")
 
     # 12. Residual Bias Diagnostics
     residuals = y_test - test_preds
