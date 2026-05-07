@@ -260,7 +260,7 @@ Using a **Random Forest Regressor**, I analyzed which factors have the greatest 
 
 ### 1. The "Big Three" Predictors (Over 67% of Total Influence)
 Just three features account for **67.08%** of the model's decision-making power when predicting math scores:
-* **Number of Siblings (32.67%):** Unexpectedly, the size of a student's family is the single strongest predictor in this model. This suggests household dynamics or resource-sharing plays a massive role.
+* **Number of Siblings (32.67%):** Unexpectedly, the size of a student's family is the single strongest predictor in this model. This may be linked to other background factors in a student's home environment, but the model cannot prove that having more siblings directly affects math scores.
 * **Hours Studied per Week (19.21%):** Unsurprisingly, active effort and study time are critical drivers of academic success.
 * **Attendance Rate (15.20%):** Showing up matters. Consistent school attendance is the third most vital pillar of performance.
 
