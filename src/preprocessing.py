@@ -98,6 +98,14 @@ def process_data(df, config):
     cols_to_drop = [col for col in cols_to_drop if col in df.columns]
     logger.info(f"Dropping columns: {cols_to_drop}")
     df = df.drop(columns=cols_to_drop)
+
+    # NEW: Specific Imputation for attendance_rate as per README documentation
+    if 'attendance_rate' in df.columns:
+        null_count = df['attendance_rate'].isnull().sum()
+        if null_count > 0:
+            attendance_median = df['attendance_rate'].median()
+            df['attendance_rate'] = df['attendance_rate'].fillna(attendance_median)
+            logger.info(f"Imputed {null_count} missing values in 'attendance_rate' using median: {attendance_median}")
     
     # 3. Standardize Categorical Redundancies
     if 'tuition' in df.columns:
