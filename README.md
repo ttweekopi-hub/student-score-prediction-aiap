@@ -22,11 +22,13 @@ student-score-prediction-aiap/
 │   ├── train.py         # Model training and pipeline serialization
 │   └── evaluation.py    # Performance metrics calculation
 │   └── utils.py         # Logging feature
-├── requirements.txt    # Python dependencies
+└── .gitignore          # files/folders to be ignored by Git
+└── Dockerfile          # Docker config file
+└── Makefile            # Orchestration script to standardize Docker and local commands
 └── README.md           # Project documentation and usage instructions
 └── config.json         # central control file to change model settings
+├── requirements.txt    # Python dependencies
 └── run.sh              # run script to auto-execute pipeline
-└── pipeline.log        # Generated automatically on script execution
 ```
 
 ## 2. Logging & Pipeline Monitoring (Production Features)
@@ -53,7 +55,9 @@ This pipeline supports three execution methods: Containerized (via Docker) for g
 ### Option A (Docker)
 Before running via Docker, you must build the environment. This ensures all dependencies and SGT-localized logging utilities are baked in.
 
-```make build```
+```bash
+make build
+```
 
 The following commands work identically across Windows (WSL), Mac, and Linux. They utilize a "self-healing" Makefile that automatically creates local log files and mounts data/model volumes.
 
