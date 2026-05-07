@@ -104,11 +104,19 @@ if __name__ == "__main__":
             logger.info(f"Resolved command-line alias '{args.model}' to '{algorithm}'.")
         else:
             algorithm = args.model  # Fallback to literal entry if user typed the full class name
+        
+        # Check if the CLI model matches the config model to preserve custom hyperparameters
+        if algorithm == config["model"]["algorithm"]:
+            params = config["model"]["parameters"]
+            logger.info(f"CLI model matches config. Using parameters from config.json: {params}")
+        else:
+            # Basic fallback if a different model is requested via CLI
+            params = {"random_state": 42} if algorithm != "LinearRegression" else {}
+            logger.warning(f"CLI Override detected for a new model type. Using default params: {params}")
             
-        params = {"random_state": 42} if algorithm != "LinearRegression" else {}
-        logger.warning(f"CLI Override detected. Training specified model: {algorithm}")
         save_path = f"models/{algorithm.lower()}_model.pkl"
     else:
+        # Standard run without CLI arguments
         algorithm = config["model"]["algorithm"]
         params = config["model"]["parameters"]
         logger.info(f"No CLI overrides. Using config.json default: {algorithm}")

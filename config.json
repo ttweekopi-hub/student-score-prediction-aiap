@@ -3,14 +3,16 @@
     "db_path": "data/score.db",
     "cleaned_csv_path": "data/cleaned_score.csv",
     "target_column": "final_test",
-    "drop_columns": ["student_id", "bag_color", "mode_of_transport", "n_female"],
+    "drop_columns": ["student_id", "bag_color", "mode_of_transport", "n_female", "index"],
     "imputation_strategy": "median"
   },
   "model": {
   "algorithm": "RandomForestRegressor",
   "parameters": {
     "n_estimators": 200,
-    "max_depth": 15,
+    "max_depth": 10,
+    "min_samples_leaf": 5,
+    "min_samples_split": 10,
     "random_state": 42
   },
   "save_path": "models/student_model.pkl"

@@ -193,14 +193,14 @@ To ensure strict validation and prevent data leakage, all models are evaluated *
 
 | Model | Evaluation Command Override | RMSE | MAE | R² Score | Target (MAE < 6.0) | Status |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Random Forest** | *Default (no flag)* | **7.9027** | **5.7672** | **0.6783** | **Met** | **Selected Model** |
+| **Random Forest** | *Default (no flag)* | **7.9083** | **5.8300** | **0.6778** | **Met** | **Selected Model** |
 | **Gradient Boosting** | `--model gbr` | 8.2750 | 6.3895 | 0.6472 | Failed | Rejected |
 | **Linear Regression** | `--model lr` | 10.0943 | 8.0861 | 0.4751 | Failed | Rejected |
 
 ### Technical Analysis & Insights
 
-1. **Why the Random Forest Won (MAE: 5.76 marks, R²: 0.6783):**
-   The Random Forest Regressor successfully met the acceptance criteria of < 6 MAE score. It explains **67.8% of the variance** on unseen data, keeping predictions within an average margin of **$\pm$ 5.7 marks**. This high precision allows teachers to confidently identify at-risk students who need remedial help without suffering from excessive false alarms.
+1. **Why the Random Forest Won (MAE: 5.83 marks, R²: 0.6778):**
+   The Random Forest Regressor successfully met the acceptance criteria of < 6 MAE score. It explains **67.7% of the variance** on unseen data, keeping predictions within an average margin of **$\pm$ 5.8 marks**. This high precision allows teachers to confidently identify at-risk students who need remedial help without suffering from excessive false alarms.
 
 2. **Why Gradient Boosting Fell Behind Random Forest (MAE: 6.38 marks, R²: 0.6472):**
    While Gradient Boosting is highly capable, its sequential optimization was slightly more sensitive to noise in the categorical indicators (such as tuition and CCA types) compared to the parallel, variance-reducing nature of Random Forest's bootstrap aggregation (bagging).
@@ -212,19 +212,17 @@ To ensure strict validation and prevent data leakage, all models are evaluated *
 
 | Rank | Feature / Predictive Factor | Relative Influence (%) |
 | :---: | :--- | :---: |
-| 1 | Number of Siblings | 27.18% |
-| 2 | Hours Studied per Week | 19.42% |
-| 3 | Attendance Rate | 16.48% |
-| 4 | Direct Admission (Yes) | 9.46% |
-| 5 | Class Gender Ratio (Number of Males) | 8.61% |
-| 6 | Co-Curricular Activity: None | 5.38% |
-| 7 | Learning Style: Visual | 4.36% |
-| 8 | Extra Tuition (Yes) | 4.10% |
-| 9 | Student Age | 1.64% |
-| 10 | Gender: Male | 1.19% |
-| 11 | Co-Curricular Activity: Clubs | 0.87% |
-| 12 | Co-Curricular Activity: Sports | 0.80% |
-| 13 | Sleep Duration | 0.50% |
+| 1 | Number of Siblings | 32.67% |
+| 2 | Hours Studied per Week | 19.21% |
+| 3 | Attendance Rate | 15.20% |
+| 4 | Direct Admission (Yes) | 11.34% |
+| 5 | Co-Curricular Activity: None | 6.45% |
+| 6 | Learning Style: Visual | 5.07% |
+| 7 | Extra Tuition (Yes) | 4.95% |
+| 8 | Student Age | 0.36% |
+| 9 | Co-Curricular Activity: Clubs | 0.26% |
+| 10 | Co-Curricular Activity: Sports | 0.18% |
+| 11 | Sleep Duration | 0.08% |
 
 ### Feature Importance Analysis (Gradient Boosting Regressor)
 
@@ -251,19 +249,19 @@ Linear Regression model does not natively support feature importances.
 Using a **Random Forest Regressor**, I analyzed which factors have the greatest predictive power on a student's final math score. 
 
 ### 1. The "Big Three" Predictors (Over 63% of Total Influence)
-Just three features account for **63.08%** of the model's decision-making power when predicting math scores:
-* **Number of Siblings (27.18%):** Unexpectedly, the size of a student's family is the single strongest predictor in this model. This suggests household dynamics or resource-sharing plays a massive role.
-* **Hours Studied per Week (19.42%):** Unsurprisingly, active effort and study time are critical drivers of academic success.
-* **Attendance Rate (16.48%):** Showing up matters. Consistent school attendance is the third most vital pillar of performance.
+Just three features account for **67.08%** of the model's decision-making power when predicting math scores:
+* **Number of Siblings (32.67%):** Unexpectedly, the size of a student's family is the single strongest predictor in this model. This suggests household dynamics or resource-sharing plays a massive role.
+* **Hours Studied per Week (19.21%):** Unsurprisingly, active effort and study time are critical drivers of academic success.
+* **Attendance Rate (15.20%):** Showing up matters. Consistent school attendance is the third most vital pillar of performance.
 
 ### 2. Moderate Influencers (The School & Social Environment)
-* **Direct Admission & Class Demographics (~18% combined):** Whether a student was admitted directly (9.46%) and the gender ratio of the classroom (8.61%) hold moderate weight, suggesting that both admission pathways and classroom environments shape outcomes.
-* **Lack of Activities (5.38%):** Having *no* Co-Curricular Activities (CCAs) is more influential than participating in specific ones (like sports or clubs), indicating that being completely disengaged from school activities may impact academic focus.
+* **Direct Admission & Class Demographics:** Whether a student was admitted directly (11.34%) hold moderate weight, suggesting that admission pathways may shape outcomes.
+* **Lack of Activities (6.45%):** Having *no* Co-Curricular Activities (CCAs) is more influential than participating in specific ones (like sports or clubs), indicating that being completely disengaged from school activities may impact academic focus.
 
 ### 3. Low-Impact Factors (Surprisingly Weak Predictors)
 Several factors that intuitively seem important actually have **almost zero predictive power** in this model:
-* **Sleep & Age (~2% combined):** Student age (1.64%) and sleep duration (0.50%) barely register as important to the final math score.
-* **Specific CCAs (<1%):** While having *no* activity had some impact, whether a student chose Sports (0.80%) vs. Clubs (0.87%) does not meaningfully alter the prediction.
+* **Sleep & Age:** Student age (0.36%) and sleep duration (0.08%) barely register as important to the final math score.
+* **Specific CCAs (<1%):** While having *no* activity had some impact, whether a student chose Sports (0.18%) vs. Clubs (0.26%) does not meaningfully alter the prediction.
 
 
 ## Explanation of Evaluation Metrics

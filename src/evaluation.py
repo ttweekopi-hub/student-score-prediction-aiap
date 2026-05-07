@@ -1,11 +1,10 @@
 import pandas as pd  # Data manipulation
 import joblib  # To load the saved model
-from sklearn.metrics import mean_squared_error, r2_score  # Metrics
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error  # Metrics
 from sklearn.model_selection import train_test_split  # To split out the test set
 import numpy as np  # For square root calculation
 import json  # Config parser
 import argparse  # For parsing command line arguments
-from sklearn.metrics import mean_absolute_error
 from src.utils import setup_logger  # Import the timezone-locked logger
 
 # Initialize the logger for the evaluation module
@@ -43,12 +42,14 @@ def load_config(config_path="config.json"):
         raise
 
 def evaluate_model():
-    """Evaluates a trained model pipeline on the unseen test set partition.
+    """Evaluates a trained model pipeline on both train and test partitions.
 
     This function isolates the validation split (the same 20% validation split 
     defined during training), restores the serialized preprocessor/model pipeline,
-    evaluates performance metrics (RMSE, MAE, R2), and outputs a sorted 
-    Feature Importance leaderboard to provide stakeholder interpretability.
+    generates predictions on both training and validation splits to explicitly 
+    diagnose overfitting, calculates comprehensive regression metrics (RMSE, MAE, R2), 
+    and outputs a sorted Feature Importance leaderboard to provide stakeholder 
+    interpretability.
 
     Returns:
         None: Logs output metrics directly to the console and appends to the log file.
@@ -103,8 +104,8 @@ def evaluate_model():
 
     # 6. Split into Train and Test sets (using the exact same parameters as train.py)
     # This isolates the test set to ensure we only evaluate on unseen data!
-    logger.info("Isolating unseen 20% test partition for evaluation.")
-    _, X_test, _, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    logger.info("Isolating train (80%) and test (20%) partitions for diagnostic evaluation.")
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # 7. Load the trained model pipeline
     try:
@@ -114,23 +115,49 @@ def evaluate_model():
         logger.error(f"Could not find model file at '{model_path}'. Did you run training first? Error: {e}")
         return
 
-    # 8. Make Predictions on UNSEEN test data only
-    logger.info("Generating predictions on validation features...")
-    predictions = model.predict(X_test)
+    # 8. Generate Predictions on BOTH partitions to check for overfitting
+    logger.info("Generating predictions for comparative metrics...")
+    train_preds = model.predict(X_train)
+    test_preds = model.predict(X_test)
 
-    # 9. Calculate Metrics using the actual test targets
-    mse = mean_squared_error(y_test, predictions)
-    rmse = np.sqrt(mse)
-    r2 = r2_score(y_test, predictions)
-    mae = mean_absolute_error(y_test, predictions)
+    # 9. Calculate Train Metrics
+    train_rmse = np.sqrt(mean_squared_error(y_train, train_preds))
+    train_mae = mean_absolute_error(y_train, train_preds)
+    train_r2 = r2_score(y_train, train_preds)
 
-    # 10. Display and save performance metrics
-    logger.info("Evaluation complete. Logging final performance metrics:")
-    logger.info(f"   >>> RMSE:     {rmse:.4f} marks")
-    logger.info(f"   >>> MAE:      {mae:.4f} marks")
-    logger.info(f"   >>> R2 Score: {r2:.4f}")
+    # 10. Calculate Test Metrics
+    test_rmse = np.sqrt(mean_squared_error(y_test, test_preds))
+    test_mae = mean_absolute_error(y_test, test_preds)
+    test_r2 = r2_score(y_test, test_preds)
 
-    # 11. Extract and Print Feature Importance for Interpretability
+    # 11. Log and Contrast Performance (The Overfitting Check)
+    logger.info("-----------------------------------------")
+    logger.info("        Training vs. Testing Metrics     ")
+    logger.info("-----------------------------------------")
+    logger.info(f"   [TRAIN] RMSE: {train_rmse:.4f} marks  |  [TEST] RMSE: {test_rmse:.4f} marks")
+    logger.info(f"   [TRAIN] MAE:  {train_mae:.4f} marks  |  [TEST] MAE:  {test_mae:.4f} marks")
+    logger.info(f"   [TRAIN] R2:   {train_r2:.4f}        |  [TEST] R2:   {test_r2:.4f}")
+    logger.info("-----------------------------------------")
+
+    # Diagnose performance health
+    if train_r2 - test_r2 > 0.15:
+        logger.warning("🚨 WARNING: High variance detected! The model is likely OVERFITTING the training data.")
+    elif test_r2 < 0.40:
+        logger.warning("🚨 WARNING: Low predictive power detected! The model may be UNDERFITTING.")
+    else:
+        logger.info("✅ Model generalization appears healthy (low variance between Train and Test performance).")
+
+    # 12. Residual Bias Diagnostics
+    residuals = y_test - test_preds
+    mean_residual = np.mean(residuals)
+    logger.info(f"   >>> Mean Prediction Error (Residual Mean): {mean_residual:.4f} marks")
+    
+    if abs(mean_residual) > 0.5:
+        logger.warning("⚠️ BIAS DETECTED: The model's predictions are systematically biased (consistently over/under-estimating).")
+    else:
+        logger.info("✅ Unbiased predictions: The error distribution is centered tightly around zero.")
+
+    # 13. Extract and Print Feature Importance for Interpretability
     logger.info("=========================================")
     logger.info("       Feature Importance Analysis       ")
     logger.info("=========================================")
