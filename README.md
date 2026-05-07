@@ -140,6 +140,7 @@ The pipeline follows a sequential flow from raw data to evaluation:
 | `attendance_rate` | Numerical | Imputed with Median | Handle missing values without dropping rows. |
 | `mode_of_transport` | Categorical | Dropped | No correlation with academic performance observed in EDA; logistical detail with no predictive signal. |
 | `CCA` | Categorical | Normalized into consistent categories: 'Clubs', 'Sports', 'None' | To ensure the OneHotEncoder correctly interpreted "None" as a valid behavioral state rather than a missing value.
+| `bag_color` | Categorical | Dropped | Unlikely owning a red bag will make a student better at math. |
 
 ## 📊 Data Quality & Cleaning Findings<br>
 Target Variable Integrity: During the initial data audit, 495 rows were identified as missing the target variable (final_test).
