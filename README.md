@@ -271,8 +271,9 @@ Just three features account for **67.08%** of the model's decision-making power 
 ### 3. Low-Impact Factors (Surprisingly Weak Predictors)
 Several factors that intuitively seem important actually have **almost zero predictive power** in this model:
 * **Sleep & Age:** Student age (0.36%) and sleep duration (0.08%) barely register as important to the final math score.
-* **Specific CCAs (<1%):** While having *no* activity had some impact, whether a student chose Sports (0.18%) vs. Clubs (0.26%) does not meaningfully alter the prediction.
+* **Specific CCAs (<1%):** While having *no* activity had some impact, whether a student chose Sports (0.18%) vs. Clubs (0.26%) does not meaningfully alter the prediction.<br>
 
+While sleep_duration shows low overall predictive importance (0.08%), EDA reveals it acts as a critical threshold requirement. Data indicates that 7+ hours of sleep is a necessary condition for achieving scores above 50, even though it does not guarantee a high result on its own.
 
 
 ## Explanation of Evaluation Metrics
