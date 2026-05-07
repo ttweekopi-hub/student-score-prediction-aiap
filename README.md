@@ -48,9 +48,23 @@ my_project_root/
 
 ## 3. Instructions for Execution
 
-This pipeline supports two execution methods: a **one-click automated runner** (recommended for quick grading) and **manual step-by-step commands** (designed for custom experiments and model-swapping).
+This pipeline supports three execution methods: Containerized (via Docker) for guaranteed reproducibility, a **one-click automated runner** (recommended for quick grading) and **manual step-by-step commands** (designed for custom experiments and model-swapping).
 
-### Option A: Quickstart (One-Click Automated Run)
+### Option A (Docker)
+Before running via Docker, you must build the environment. This ensures all dependencies and SGT-localized logging utilities are baked in.
+
+```make build```
+
+The following commands work identically across Windows (WSL), Mac, and Linux. They utilize a "self-healing" Makefile that automatically creates local log files and mounts data/model volumes.
+
+| Action | Docker Command | Local Python Command |
+| :--- | :--- | :--- |
+| **Preprocess Data** | `make preprocess` | `python -m src.preprocessing` |
+| **Train (Default RF)** | `make train` | `python -m src.train` |
+| **Train (Linear Reg)** | `make train model=lr` | `python -m src.train --model lr` |
+| **Evaluate Model** | `make evaluate model=lr` | `python -m src.evaluation --model lr` |
+
+### Option B: Quickstart (One-Click Automated Run)
 
 The repository includes a cross-platform pipeline runner script (`run.sh`). It automatically checks for the database, creates and isolates a virtual environment (`venv`), installs dependencies, runs preprocessing, trains the optimized Random Forest model, and runs the evaluation.
 
@@ -62,7 +76,7 @@ chmod +x run.sh
 # Execute the pipeline
 ./run.sh
 ```
-### Option B: Step-by-Step Execution (For Custom Experimentation)
+### Option C: Step-by-Step Execution (For Custom Experimentation)
 
 This is the alternative execution option for running the pipeline.  It is highly configurable (unlike the one-click automated option which runs just our best recommended Random Forest model) and supports execution with different machine learning algorithms and parameters using a combination of a configuration file (`config.json`) and command-line interface (CLI) parameter overrides.<br>
 **Run all terminal commands from the root folder of the cloned repository (/student-score-prediction-aiap).**
