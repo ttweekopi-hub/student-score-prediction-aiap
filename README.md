@@ -162,11 +162,13 @@ The *config.json* file controls directories, database targets, column modificati
   },
   "model": {
     "algorithm": "RandomForestRegressor",
-    "parameters": {
-      "n_estimators": 100,
-      "max_depth": 10,
-      "random_state": 42
-    },
+        "parameters": {
+        "n_estimators": 200,
+        "max_depth": 10,
+        "min_samples_leaf": 5,
+        "min_samples_split": 10,
+        "random_state": 42
+  },
     "save_path": "models/student_model.pkl"
   }
 }
@@ -248,7 +250,7 @@ Linear Regression model does not natively support feature importances.
 
 Using a **Random Forest Regressor**, I analyzed which factors have the greatest predictive power on a student's final math score. 
 
-### 1. The "Big Three" Predictors (Over 63% of Total Influence)
+### 1. The "Big Three" Predictors (Over 67% of Total Influence)
 Just three features account for **67.08%** of the model's decision-making power when predicting math scores:
 * **Number of Siblings (32.67%):** Unexpectedly, the size of a student's family is the single strongest predictor in this model. This suggests household dynamics or resource-sharing plays a massive role.
 * **Hours Studied per Week (19.21%):** Unsurprisingly, active effort and study time are critical drivers of academic success.
