@@ -138,6 +138,17 @@ The pipeline follows a sequential flow from raw data to evaluation:
 | `n_female` | Numerical | Dropped | High multicollinearity with `n_male`. |
 | `sleep_time` | String | Combined into `sleep_duration` | Convert raw time to usable duration. |
 | `attendance_rate` | Numerical | Imputed with Median | Handle missing values without dropping rows. |
+| `mode_of_transport` | Categorical | Dropped | No correlation with academic performance observed in EDA; logistical detail with no predictive signal. |
+| `CCA` | Categorical | Normalized into consistent categories: 'Clubs', 'Sports', 'None' | To ensure the OneHotEncoder correctly interpreted "None" as a valid behavioral state rather than a missing value.
+
+## 📊 Data Quality & Cleaning Findings<br>
+Target Variable Integrity: During the initial data audit, 495 rows were identified as missing the target variable (final_test).
+
+Action Taken: These rows were deliberately dropped from the pipeline rather than using imputation.
+
+Justification: In predictive modeling, imputing a target variable introduces "synthetic noise" and artificial bias that can lead to misleading accuracy metrics. Dropping these records ensures the model is trained only on ground-truth performance data, maintaining the scientific integrity of the results.
+
+Multicollinearity (Gender Distribution): Analysis of classroom demographics revealed that n_male and n_female were perfectly negatively correlated. To prevent the Dummy Variable Trap and ensure model stability, n_female was dropped, and n_male was retained as the representative feature for classroom gender composition.
 
 ## 6. Choice of Model and Evaluation
 
@@ -216,10 +227,12 @@ To ensure strict validation and prevent data leakage, all models are evaluated *
 | 5 | Co-Curricular Activity: None | 6.45% |
 | 6 | Learning Style: Visual | 5.07% |
 | 7 | Extra Tuition (Yes) | 4.95% |
-| 8 | Student Age | 0.36% |
-| 9 | Co-Curricular Activity: Clubs | 0.26% |
-| 10 | Co-Curricular Activity: Sports | 0.18% |
-| 11 | Sleep Duration | 0.08% |
+| 8 | n_male | 3.86% |
+| 9 | gender_Male | 0.38% |
+| 10 | Student Age | 0.36% |
+| 11 | Co-Curricular Activity: Clubs | 0.26% |
+| 12 | Co-Curricular Activity: Sports | 0.18% |
+| 13 | Sleep Duration | 0.08% |
 
 ### Feature Importance Analysis (Gradient Boosting Regressor)
 

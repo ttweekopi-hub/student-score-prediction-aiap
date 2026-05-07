@@ -15,6 +15,10 @@ class SingaporeFormatter(logging.Formatter):
         return sgt_dt.strftime('%d-%m-%Y %H:%M:%S')
 
 def setup_logger(name, log_file="pipeline.log", level=logging.INFO):
+    """Shared logging utilities for the student score prediction pipeline.
+    Provides a timezone-aware (SGT, UTC+8) logger with simultaneous
+    console and persistent file output.
+    """
     log_dir = os.path.dirname(log_file)
     if log_dir and not os.path.exists(log_dir):
         os.makedirs(log_dir)
