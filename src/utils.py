@@ -1,3 +1,9 @@
+"""Shared logging utilities for the student score prediction pipeline.
+
+Provides a timezone-aware (SGT, UTC+8) logger with simultaneous
+console and persistent file output.
+"""
+
 import logging
 import os
 from datetime import datetime
@@ -14,11 +20,6 @@ class SingaporeFormatter(logging.Formatter):
             return sgt_dt.strftime(datefmt)
         return sgt_dt.strftime('%d-%m-%Y %H:%M:%S')
 
-
-"""Shared logging utilities for the student score prediction pipeline.
-Provides a timezone-aware (SGT, UTC+8) logger with simultaneous
-console and persistent file output.
-"""
 def setup_logger(name, log_file="pipeline.log", level=logging.INFO):
     """Initialises and returns a named logger with SGT-aware formatting.
 
