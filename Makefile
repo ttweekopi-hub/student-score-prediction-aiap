@@ -1,0 +1,35 @@
+# Variables
+IMAGE_NAME=student-score-pipeline
+# Using absolute paths for reliability across different systems
+PWD=$(shell pwd)
+
+# Volume definitions
+DATA_VOL=-v $(PWD)/data:/app/data
+MODEL_VOL=-v $(PWD)/data:/app/data -v $(PWD)/models:/app/models
+LOG_VOL=-v $(PWD)/pipeline.log:/app/pipeline.log
+
+# Default model variable (can be overridden with MODEL=lr in terminal)
+MODEL ?= rf
+# If 'model' (lowercase) is provided in the command line, override MODEL
+ifdef model
+    MODEL := $(model)
+endif
+
+.PHONY: build preprocess train evaluate all
+
+build:
+	docker build -t $(IMAGE_NAME) .
+
+preprocess:
+	@touch pipeline.log
+	docker run $(DATA_VOL) $(LOG_VOL) $(IMAGE_NAME) src.preprocessing
+
+train:
+	@touch pipeline.log
+	docker run $(MODEL_VOL) $(LOG_VOL) $(IMAGE_NAME) src.train --model $(MODEL)
+
+evaluate:
+	@touch pipeline.log
+	docker run $(MODEL_VOL) $(LOG_VOL) $(IMAGE_NAME) src.evaluation --model $(MODEL)
+
+all: build preprocess train evaluate
