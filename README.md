@@ -157,7 +157,7 @@ The *config.json* file controls directories, database targets, column modificati
     "db_path": "data/score.db",
     "cleaned_csv_path": "data/cleaned_score.csv",
     "target_column": "final_test",
-    "drop_columns": ["student_id", "bag_color", "mode_of_transport", "n_female"],
+    "drop_columns": ["student_id", "bag_color", "mode_of_transport", "n_female", "index"],
     "imputation_strategy": "median"
   },
   "model": {
@@ -202,16 +202,11 @@ To ensure strict validation and prevent data leakage, all models are evaluated *
 1. **Why the Random Forest Won (MAE: 5.76 marks, R²: 0.6783):**
    The Random Forest Regressor successfully met the acceptance criteria of < 6 MAE score. It explains **67.8% of the variance** on unseen data, keeping predictions within an average margin of **$\pm$ 5.7 marks**. This high precision allows teachers to confidently identify at-risk students who need remedial help without suffering from excessive false alarms.
 
-2. **Why the Linear Model Struggled (MAE: 8.08 marks, R²: 0.4751):**
-   Linear Regression left more than 52% of the variance unexplained. Because it is forced to fit relationships to a straight line, it cannot model non-linear boundaries. For example, losing an hour of sleep does not degrade performance linearly; instead, performance drops sharply past the 7-hour threshold. Linear Regression averages these trends out, resulting in a much wider margin of error ($\pm$ 8.0 marks) which is too loose for practical school intervention.
-
-3. **Why Gradient Boosting Fell Behind Random Forest (MAE: 6.38 marks, R²: 0.6472):**
+2. **Why Gradient Boosting Fell Behind Random Forest (MAE: 6.38 marks, R²: 0.6472):**
    While Gradient Boosting is highly capable, its sequential optimization was slightly more sensitive to noise in the categorical indicators (such as tuition and CCA types) compared to the parallel, variance-reducing nature of Random Forest's bootstrap aggregation (bagging).
 
-### Explanation of Evaluation Metrics
-* **MAE (Mean Absolute Error):** Chosen as our primary business metric because it represents the average prediction error in physical units (marks). An MAE of 5.83 means our predictions are, on average, within 5.8 marks of the student's true O-level score.
-* **RMSE (Root Mean Squared Error):** Chosen to penalize larger prediction errors more heavily. Our winning model's RMSE of 7.91 indicates that we have managed to keep large, outlier prediction errors to a minimum.
-* **R² (Coefficient of Determination):** Measures the proportion of variance in O-level math scores that our features can predict.
+3. **Why the Linear Model Struggled (MAE: 8.08 marks, R²: 0.4751):**
+   Linear Regression left more than 52% of the variance unexplained. Because it is forced to fit relationships to a straight line, it cannot model non-linear boundaries. For example, losing an hour of sleep does not degrade performance linearly; instead, performance drops sharply past the 7-hour threshold. Linear Regression averages these trends out, resulting in a much wider margin of error ($\pm$ 8.0 marks) which is too loose for practical school intervention.
 
 ### Feature Importance Analysis (Random Forest)
 
@@ -250,3 +245,28 @@ To ensure strict validation and prevent data leakage, all models are evaluated *
 | 13 | Co-Curricular Activity: Sports | 0.01% |
 
 Linear Regression model does not natively support feature importances.
+
+## 📊 Key Findings: What Drives Final Math Scores?
+
+Using a **Random Forest Regressor**, I analyzed which factors have the greatest predictive power on a student's final math score. 
+
+### 1. The "Big Three" Predictors (Over 63% of Total Influence)
+Just three features account for **63.08%** of the model's decision-making power when predicting math scores:
+* **Number of Siblings (27.18%):** Unexpectedly, the size of a student's family is the single strongest predictor in this model. This suggests household dynamics or resource-sharing plays a massive role.
+* **Hours Studied per Week (19.42%):** Unsurprisingly, active effort and study time are critical drivers of academic success.
+* **Attendance Rate (16.48%):** Showing up matters. Consistent school attendance is the third most vital pillar of performance.
+
+### 2. Moderate Influencers (The School & Social Environment)
+* **Direct Admission & Class Demographics (~18% combined):** Whether a student was admitted directly (9.46%) and the gender ratio of the classroom (8.61%) hold moderate weight, suggesting that both admission pathways and classroom environments shape outcomes.
+* **Lack of Activities (5.38%):** Having *no* Co-Curricular Activities (CCAs) is more influential than participating in specific ones (like sports or clubs), indicating that being completely disengaged from school activities may impact academic focus.
+
+### 3. Low-Impact Factors (Surprisingly Weak Predictors)
+Several factors that intuitively seem important actually have **almost zero predictive power** in this model:
+* **Sleep & Age (~2% combined):** Student age (1.64%) and sleep duration (0.50%) barely register as important to the final math score.
+* **Specific CCAs (<1%):** While having *no* activity had some impact, whether a student chose Sports (0.80%) vs. Clubs (0.87%) does not meaningfully alter the prediction.
+
+
+## Explanation of Evaluation Metrics
+* **MAE (Mean Absolute Error):** Chosen as our primary business metric because it represents the average prediction error in physical units (marks). An MAE of 5.76 means our predictions are, on average, within 5.7 marks of the student's true O-level score.
+* **RMSE (Root Mean Squared Error):** Chosen to penalize larger prediction errors more heavily. Our winning model's RMSE of 7.91 indicates that we have managed to keep large, outlier prediction errors to a minimum.
+* **R² (Coefficient of Determination):** Measures the proportion of variance in O-level math scores that our features can predict.
