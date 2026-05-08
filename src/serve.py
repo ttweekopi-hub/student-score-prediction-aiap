@@ -162,6 +162,15 @@ async def predict(model_name: str, input_data: StudentInput):
         except:
             print("\nCould not extract categories, but the 200 OK means the model is guessing anyway!")
 
+        # Convert your processed data to a DataFrame if it isn't one
+        if not isinstance(processed_df, pd.DataFrame):
+            # Use the expected columns from the model
+            expected_columns = models[model_name].feature_names_in_
+            processed_df = pd.DataFrame(processed_df, columns=expected_columns)
+
+        # Explicitly cast to object to avoid the 'isnan' string error we saw earlier
+        processed_df = processed_df.astype(object)
+
         # Inference
         try:
             prediction = models[model_name].predict(processed_df)
