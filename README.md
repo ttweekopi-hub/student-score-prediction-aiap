@@ -27,7 +27,7 @@ student-score-prediction-aiap/
 └── Makefile            # Orchestration script to standardize Docker and local commands
 └── README.md           # Project documentation and usage instructions
 └── config.json         # central control file to change model settings
-├── requirements.txt    # Python dependencies
+└── requirements.txt    # Python dependencies
 └── run.sh              # run script to auto-execute pipeline
 ```
 
@@ -47,6 +47,7 @@ my_project_root/
 └── pipeline.log             # Generated automatically on script execution
 ```
 
+**The pipeline also supports containerized execution via Docker — see Option A in Section 3.**
 
 ## 3. Instructions for Execution
 
@@ -162,12 +163,13 @@ The pipeline follows a sequential flow from raw data to evaluation:
 | Feature | Type | Processing Action | Reason |
 | :--- | :--- | :--- | :--- |
 | `student_id` | ID | Dropped | No predictive signal. |
+| `index` | ID | Dropped | Duplicate row index artifact from the database export; no predictive signal. |
 | `tuition` | Categorical | Replace 'Y'/'N' with 'Yes'/'No' | Standardize labels for encoding. |
 | `n_female` | Numerical | Dropped | High multicollinearity with `n_male`. |
 | `sleep_time` | String | Combined into `sleep_duration` | Convert raw time to usable duration. |
 | `attendance_rate` | Numerical | Imputed with Median | Handle missing values without dropping rows. |
 | `mode_of_transport` | Categorical | Dropped | No correlation with academic performance observed in EDA; logistical detail with no predictive signal. |
-| `CCA` | Categorical | Normalized into consistent categories: 'Clubs', 'Sports', 'None' | To ensure the OneHotEncoder correctly interpreted "None" as a valid behavioral state rather than a missing value.
+| `CCA` | Categorical | Normalized into consistent categories: 'Clubs', 'Sports', 'None' | To ensure the OneHotEncoder correctly interpreted "None" as a valid behavioral state rather than a missing value. |
 | `bag_color` | Categorical | Dropped | Unlikely owning a red bag will make a student better at math. |
 
 ## 📊 Data Quality & Cleaning Findings<br>
