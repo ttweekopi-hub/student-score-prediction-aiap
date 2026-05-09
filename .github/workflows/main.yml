@@ -1,15 +1,14 @@
-name: ML Pipeline CI
+name: ML Pipeline CI/CD
 
 on:
   push:
-    branches: [main]
+    branches: [fastapi]
   pull_request:
-    branches: [main]
+    branches: [fastapi]
 
 jobs:
   run-pipeline:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,7 +25,6 @@ jobs:
           pip install -r requirements.txt
 
       - name: Generate Mock Database
-        # This creates data/score.db on the runner so the pipeline can start
         run: python scripts/generate_test_data.py
 
       - name: Run Preprocessing
@@ -37,23 +35,24 @@ jobs:
 
       - name: Evaluate and Assert MAE
         run: |
-          # Capture the output of your evaluation script
           RESULTS=$(python -m src.evaluation)
           echo "$RESULTS"
-          
-          # Use Python to check if MAE is within your AIAP success criteria (< 6.0)
           python -c "
           import re, sys
           text = '''$RESULTS'''
           match = re.search(r'MAE[:\s]+([0-9]+\.[0-9]+)', text)
           if not match:
-              print('❌ Error: Could not parse MAE from evaluation output.')
               sys.exit(1)
-          
           mae = float(match.group(1))
           if mae > 6.0:
-              print(f'❌ Failure: MAE is {mae}, which exceeds the 6.0 threshold.')
               sys.exit(1)
-          
-          print(f'✅ Success: MAE is {mae}, satisfying the project requirements.')
           "
+
+  deploy:
+    needs: run-pipeline
+    if: github.ref == 'refs/heads/fastapi'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deployment
+        run: |
+          curl -f ${{ secrets.RENDER_DEPLOY_HOOK }}
