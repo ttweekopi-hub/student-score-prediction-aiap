@@ -2,6 +2,9 @@
 
 This page documents the behavioral validation of the Student Exam Score Prediction API. Three models (**Random Forest**, **Gradient Boosting**, and **Linear Regression**) were tested across various scenarios to ensure logical consistency and evaluate performance nuances.
 
+![Alt Text](assets/SwaggerUI.png)
+![Alt Text](assets/SwaggerUI2.png)
+![Alt Text](assets/SwaggerUI3.png)
 ---
 
 ## 1. Baseline Scenario (Standard Student)
