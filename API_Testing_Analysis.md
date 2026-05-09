@@ -119,11 +119,19 @@ Random Forest places the highest value on tuition (+6.76). This suggests that in
 ***🔍 Test Findings: Complex Category Handling***<br>
 This section reveals a major technical distinction between the models:
 
-Gradient Boosting (GBR) Invariance: The GBR score remains exactly 63.30 across all CCAs. This indicates that the GBR model likely pruned these features during training, considering them "noise". This is a notable limitation: the GBR model cannot differentiate students based on CCA engagement, reducing its utility for holistic student profiling.
+- **Gradient Boosting (GBR) — Invariance:** The GBR score remains exactly 63.30 across all 
+CCAs, indicating that the model likely pruned these features during training, considering them 
+"noise." This is a notable limitation — GBR cannot differentiate students based on CCA 
+engagement, reducing its utility for holistic student profiling.
 
-Random Forest Logic: RF ranks "None" as the highest (66.01). This suggests the model found that students without CCAs might have more uninterrupted focus for exams. This is consistent with the feature importance table, where CCA: None ranks 5th at 6.45% — far above CCA: Clubs (0.26%) and CCA: Sports (0.18%)
+- **Random Forest (RF) — Nuanced Sensitivity:** RF ranks "None" as the highest (66.01), 
+suggesting that students without CCAs may have more uninterrupted focus for exams. This is 
+consistent with the feature importance table, where CCA: None ranks 5th at 6.45% — far above 
+CCA: Clubs (0.26%) and CCA: Sports (0.18%).
 
-Linear Regression Logic: LR actually ranks "Sports" (62.94) higher than "None" (62.49). This implies a positive linear correlation between physical activity and academic performance within the LR framework.
+- **Linear Regression (LR) — Activity Bias:** LR ranks "Sports" (62.94) above "None" (62.49), 
+implying a positive linear correlation between physical activity and academic performance within 
+the LR framework.
 
 ## Conclusion & Recommendation
 Based on the deep-dive analysis, the **Random Forest (RF) model** is recommended as the primary production model for the following reasons:
