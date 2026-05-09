@@ -2,9 +2,9 @@ name: ML Pipeline CI/CD
 
 on:
   push:
-    branches: [fastapi]
+    branches: [main]
   pull_request:
-    branches: [fastapi]
+    branches: [main]
 
 jobs:
   run-pipeline:
@@ -50,7 +50,7 @@ jobs:
 
   deploy:
     needs: run-pipeline
-    if: github.ref == 'refs/heads/fastapi'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render Deployment
