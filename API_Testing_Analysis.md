@@ -1,4 +1,4 @@
-# 📊 Model Prediction & Deep-Dive Analysis
+# Model Prediction & Deep-Dive Analysis
 
 This page documents the behavioral validation of the Student Exam Score Prediction API. Three models (**Random Forest**, **Gradient Boosting**, and **Linear Regression**) were tested across various scenarios to ensure logical consistency and evaluate performance nuances.
 
@@ -30,10 +30,10 @@ This page documents the behavioral validation of the Student Exam Score Predicti
 | **Linear Regression (LR)** | 62.94 | The mathematical "average" expectation for these inputs. |
 
 🔍 ***Test Findings: Model Consensus***<br>
-In the baseline test, all three models produced results within a narrow 2.65-point range. This high level of consensus confirms that the dataset has a strong signal. The slight lead of the Random Forest suggests it is capturing non-linear "bonuses" for students who have both high attendance and tuition.
+In the baseline test, all three models produced results within a narrow 2.65-point range, this spread falls within the model's MAE of 5.83. This high level of consensus confirms that the dataset has a strong signal. The slight lead of the Random Forest suggests it is capturing non-linear "bonuses" for students who have both high attendance and tuition.
 
 ## 2. Stress Test: Attendance Sensitivity
-Description: Extreme scenario where attendance is dropped from 95% → 10% to test model logic.
+**Description:** Extreme scenario where attendance is dropped from 95% → 10% to test model logic.
 
 **Full JSON Payload:**
 ```json
@@ -57,7 +57,7 @@ Description: Extreme scenario where attendance is dropped from 95% → 10% to te
 | **Linear Regression (LR)** | 34.58 | -28.36 |
 
 🔍 ***Test Findings: The Impact of Presence***<br>
-This confirms attendance as the primary driver of the score across all models.
+This confirms attendance as a significant driver, consistent with its 3rd-place feature importance ranking.
 
 Linear Regression shows the most aggressive penalty (-28.36). Since LR is a linear function, it assumes that every 1% of missing attendance results in a fixed point deduction.
 
@@ -88,10 +88,10 @@ Description: Comparing outcomes when external tuition is toggled from Yes to No.
 | **Random Forest (RF)** | 65.59 | 58.83 | +6.76 |
 | **Linear Regression (LR)** | 62.94 | 57.08 | +5.86 |
 | **Gradient Boosting (GBR)** | 63.30 | 60.96 | +2.34 |
-<br>
+
 
 ***🔍 Test Findings: Feature Weighting***<br>
-Random Forest places the highest value on tuition (+6.76). This suggests that in the training data, the presence of tuition was a strong indicator of passing. GBR is significantly less sensitive to tuition, suggesting it relies more heavily on numerical features (hours/attendance) rather than categorical labels.
+Random Forest places the highest value on tuition (+6.76). This suggests that in the training data, the presence of tuition was a meaningful categorical indicator of passing. GBR is significantly less sensitive to tuition, suggesting it relies more heavily on numerical features (hours/attendance) rather than categorical labels.
 
 ## 4. Engagement Analysis: CCA Variability
 Description: Testing the impact of different Co-Curricular Activities (Sports, Clubs, or None).
@@ -120,13 +120,13 @@ Description: Testing the impact of different Co-Curricular Activities (Sports, C
 ***🔍 Test Findings: Complex Category Handling***<br>
 This section reveals a major technical distinction between the models:
 
-Gradient Boosting (GBR) Invariance: The GBR score remains exactly 63.30 across all CCAs. This indicates that the GBR model likely pruned these features during training, considering them "noise."
+Gradient Boosting (GBR) Invariance: The GBR score remains exactly 63.30 across all CCAs. This indicates that the GBR model likely pruned these features during training, considering them "noise". This is a notable limitation: the GBR model cannot differentiate students based on CCA engagement, reducing its utility for holistic student profiling.
 
-Random Forest Logic: RF ranks "None" as the highest (66.01). This suggests the model found that students without CCAs might have more uninterrupted focus for exams.
+Random Forest Logic: RF ranks "None" as the highest (66.01). This suggests the model found that students without CCAs might have more uninterrupted focus for exams. This is consistent with the feature importance table, where CCA: None ranks 5th at 6.45% — far above CCA: Clubs (0.26%) and CCA: Sports (0.18%)
 
 Linear Regression Logic: LR actually ranks "Sports" (62.94) higher than "None" (62.49). This implies a positive linear correlation between physical activity and academic performance within the LR framework.
 
-## 🏁 Conclusion & Recommendation
+## Conclusion & Recommendation
 Based on the deep-dive analysis, the Random Forest (RF) model is recommended as the primary production model for the following reasons:
 
 **Superior Feature Sensitivity**: Unlike GBR, which ignored CCA variability, Random Forest successfully captured the subtle impacts of every feature. This ensures the model utilizes the full context of a student's profile rather than relying solely on numerical averages.
