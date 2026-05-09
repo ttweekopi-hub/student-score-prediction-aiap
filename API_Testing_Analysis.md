@@ -30,7 +30,7 @@ This page documents the behavioral validation of the Student Exam Score Predicti
 | **Linear Regression (LR)** | 62.94 | The mathematical "average" expectation for these inputs. |
 
 🔍 ***Test Findings: Model Consensus***<br>
-In the baseline test, all three models produced results within a narrow 2.65-point range, this spread falls within the model's MAE of 5.83. This high level of consensus confirms that the dataset has a strong signal. The slight lead of the Random Forest suggests it is capturing non-linear "bonuses" for students who have both high attendance and tuition.
+In the baseline test, all three models produced results within a narrow 2.65-point range — well within the model's MAE of 5.83. This high level of consensus confirms that the dataset has a strong signal. The slight lead of the Random Forest suggests it is capturing non-linear "bonuses" for students who have both high attendance and tuition.
 
 ## 2. Stress Test: Attendance Sensitivity
 **Description:** Extreme scenario where attendance is dropped from 95% → 10% to test model logic.
@@ -66,7 +66,7 @@ GBR is the most "forgiving" at 46.13. It likely assumes that the 15 hours of stu
 RF sits in the middle, identifying a clear fail state while acknowledging other input factors.
 
 ## 3. Support Analysis: The "Tuition Premium"
-Description: Comparing outcomes when external tuition is toggled from Yes to No.
+**Description:** Comparing outcomes when external tuition is toggled from Yes to No.
 
 **Full JSON Payload (Tuition: No):**
 ```json
@@ -89,12 +89,11 @@ Description: Comparing outcomes when external tuition is toggled from Yes to No.
 | **Linear Regression (LR)** | 62.94 | 57.08 | +5.86 |
 | **Gradient Boosting (GBR)** | 63.30 | 60.96 | +2.34 |
 
-
 ***🔍 Test Findings: Feature Weighting***<br>
 Random Forest places the highest value on tuition (+6.76). This suggests that in the training data, the presence of tuition was a meaningful categorical indicator of passing. GBR is significantly less sensitive to tuition, suggesting it relies more heavily on numerical features (hours/attendance) rather than categorical labels.
 
 ## 4. Engagement Analysis: CCA Variability
-Description: Testing the impact of different Co-Curricular Activities (Sports, Clubs, or None).
+**Description:** Testing the impact of different Co-Curricular Activities (Sports, Clubs, or None).
 
 **Full JSON Payload (Example - CCA: None):**
 ```json
