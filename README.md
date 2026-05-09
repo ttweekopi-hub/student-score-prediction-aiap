@@ -13,16 +13,21 @@ The pipeline is designed to predict final mathematics scores using student demog
 
 ```text
 student-score-prediction-aiap/
+├── assets/             # Stores screenshot images
 ├── data/               # Contains cleaned_score.csv (score.db must be placed here)
 ├── models/             # Stores the trained student_model.pkl
 ├── notebooks/          # Stores the Jupyter notebook file
 │   └── eda.ipynb       # Exploratory Data Analysis and visualizations
+├── scripts/          # Stores the Jupyter notebook file
+│   └── generate_test_data.py       # Generate mock database file
 ├── src/                # Python modules for the pipeline
 │   ├── preprocessing.py # Data ingestion, cleaning, and feature engineering
 │   ├── train.py         # Model training and pipeline serialization
 │   └── evaluation.py    # Performance metrics calculation
 │   └── utils.py         # Logging feature
+│   └── serve.py         # Load .pkl(model) files and expose them to REST endpoints
 └── .gitignore          # files/folders to be ignored by Git
+└── API_Testing_Analysis.md   # Documentation for using FastAPI through Swaggger UI
 └── Dockerfile          # Docker config file
 └── Makefile            # Orchestration script to standardize Docker and local commands
 └── README.md           # Project documentation and usage instructions
@@ -107,8 +112,8 @@ The following commands work identically across Windows (WSL), Mac, and Linux. Th
 | **Evaluate Model (Default RF)** | `make evaluate` | `python -m src.evaluation` |
 | **Train (Linear Reg)** | `make train model=lr` | `python -m src.train --model lr` |
 | **Evaluate Model (Linear Reg)** | `make evaluate model=lr` | `python -m src.evaluation --model lr` |
- **Train (Gradient Boost Regressor)** | `make train model=gbr` | `python -m src.train --model gbr` |
-| **Evaluate Model (Gradien Boost Regressor)** | `make evaluate model=gbr` | `python -m src.evaluation --model gbr` |
+| **Train (Gradient Boost Regressor)** | `make train model=gbr` | `python -m src.train --model gbr` |
+| **Evaluate Model (Gradient Boost Regressor)** | `make evaluate model=gbr` | `python -m src.evaluation --model gbr` |
 
 To ease input for the commands, alias have been set up for each model as follows:<br>
 | Alias | Machine Learning Algorithm |
@@ -209,7 +214,7 @@ The pipeline follows a sequential flow from raw data to evaluation:
 | `attendance_rate` | Numerical | Imputed with Median | Handle missing values without dropping rows. |
 | `mode_of_transport` | Categorical | Dropped | No correlation with academic performance observed in EDA; logistical detail with no predictive signal. |
 | `CCA` | Categorical | Normalized into consistent categories: 'Clubs', 'Sports', 'None' | To ensure the OneHotEncoder correctly interpreted "None" as a valid behavioral state rather than a missing value. |
-| `bag_color` | Categorical | Dropped | Unlikely owning a red bag will make a student better at math. |
+| `bag_color` | Categorical | Dropped | Cosmetic attribute with no plausible causal relationship to academic performance; confirmed absent from EDA correlation analysis. |
 
 ## 📊 Data Quality & Cleaning Findings<br>
 Target Variable Integrity: During the initial data audit, 495 rows were identified as missing the target variable (final_test).
