@@ -126,10 +126,10 @@ Random Forest Logic: RF ranks "None" as the highest (66.01). This suggests the m
 Linear Regression Logic: LR actually ranks "Sports" (62.94) higher than "None" (62.49). This implies a positive linear correlation between physical activity and academic performance within the LR framework.
 
 ## Conclusion & Recommendation
-Based on the deep-dive analysis, the Random Forest (RF) model is recommended as the primary production model for the following reasons:
+Based on the deep-dive analysis, the **Random Forest (RF) model** is recommended as the primary production model for the following reasons:
 
-**Superior Feature Sensitivity**: Unlike GBR, which ignored CCA variability, Random Forest successfully captured the subtle impacts of every feature. This ensures the model utilizes the full context of a student's profile rather than relying solely on numerical averages.
+- **Superior Feature Sensitivity:** Unlike GBR, which ignored CCA variability, Random Forest successfully captured the subtle impacts of every feature. This ensures the model utilizes the full context of a student's profile rather than relying solely on numerical averages.
 
-**Balanced Robustness**: While Linear Regression reacted too aggressively to low attendance (dropping to 34.58), Random Forest provided a more realistic failing "floor" (43.58). This indicates the model correctly balances primary drivers with secondary support features.
+- **Balanced Robustness:** While Linear Regression reacted too aggressively to low attendance (dropping to 34.58), Random Forest provided a more realistic failing "floor" (43.58). This indicates the model correctly balances primary drivers with secondary support features.
 
-**Holistic Prediction**: The RF model's responsiveness to categorical changes (like Tuition and CCA) results in a more sophisticated and "intelligent" prediction, making it the most reliable tool for identifying both high-performing and at-risk students.
+- **Holistic Prediction:** The RF model's responsiveness to categorical changes (like Tuition and CCA) results in a more sophisticated and "intelligent" prediction, making it the most reliable tool for identifying both high-performing and at-risk students.
