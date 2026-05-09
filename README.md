@@ -91,13 +91,6 @@ make build
 
 The following commands work identically across Windows (WSL), Mac, and Linux. They utilize a "self-healing" Makefile that automatically creates local log files and mounts data/model volumes.
 
-| Alias | Machine Learning Algorithm |
-| :--- | :--- |
-| `lr` | Linear Regression |
-| `rf` | Random Forest Regressor (Default) |
-| `gbm` / `gbr` | Gradient Boosting Regressor |
-| `svr` | Support Vector Regressor |
-
 | Action | Docker Command | Local Python Command |
 | :--- | :--- | :--- |
 | **Preprocess Data** | `make preprocess` | `python -m src.preprocessing` |
@@ -107,6 +100,14 @@ The following commands work identically across Windows (WSL), Mac, and Linux. Th
 | **Evaluate Model (Linear Reg)** | `make evaluate model=lr` | `python -m src.evaluation --model lr` |
  **Train (Gradient Boost Regressor)** | `make train model=gbr` | `python -m src.train --model gbr` |
 | **Evaluate Model (Gradien Boost Regressor)** | `make evaluate model=gbr` | `python -m src.evaluation --model gbr` |
+
+To ease input for the commands, alias have been set up for each model as follows:<br>
+| Alias | Machine Learning Algorithm |
+| :--- | :--- |
+| `lr` | Linear Regression |
+| `rf` | Random Forest Regressor (Default) |
+| `gbm` / `gbr` | Gradient Boosting Regressor |
+| `svr` | Support Vector Regressor |
 
 ### Option B: Quickstart (One-Click Automated Run)
 
