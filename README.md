@@ -348,7 +348,7 @@ Several factors that intuitively seem important actually have **almost zero pred
 * **Sleep & Age:** Student age (0.36%) and sleep duration (0.08%) barely register as important to the final math score.
 * **Specific CCAs (<1%):** While having *no* activity had some impact, whether a student chose Sports (0.18%) vs. Clubs (0.26%) does not meaningfully alter the prediction.<br>
 
-While sleep_duration shows low overall predictive importance (0.08%), EDA reveals it acts as a critical threshold requirement. Data indicates that 7+ hours of sleep is a necessary condition for achieving scores above 50, even though it does not guarantee a high result on its own.
+Sleep duration contributes little to overall prediction after stronger academic factors are considered, though exploratory analysis suggests extremely low sleep may still act as a minimum performance threshold.
 
 
 ## Explanation of Evaluation Metrics

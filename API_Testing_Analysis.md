@@ -143,4 +143,4 @@ Based on the deep-dive analysis, the **Random Forest (RF) model** is recommended
 
 - **Balanced Robustness:** While Linear Regression reacted too aggressively to low attendance (dropping to 34.58), Random Forest provided a more realistic failing "floor" (43.58). This indicates the model correctly balances primary drivers with secondary support features.
 
-- **Holistic Prediction:** The RF model's responsiveness to categorical changes (like Tuition and CCA) results in a more sophisticated and "intelligent" prediction, making it the most reliable tool for identifying both high-performing and at-risk students.
+- **Holistic Prediction:** The RF model's responsiveness to categorical changes (like Tuition and CCA) results in a more context-sensitive prediction behavior prediction, making it the most reliable tool for identifying both high-performing and at-risk students.
