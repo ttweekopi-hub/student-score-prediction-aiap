@@ -84,6 +84,9 @@ async def predict(model_name: str, input_data: StudentInput):
     Returns:
         dict: The prediction result and model metadata.
     """
+    # Convert input to lowercase to ensure case-insensitivity
+    model_name = model_name.lower()
+    
     if model_name not in models:
         raise HTTPException(status_code=404, detail=f"Model '{model_name}' not available.")
 
