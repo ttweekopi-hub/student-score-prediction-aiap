@@ -35,17 +35,41 @@ jobs:
 
       - name: Evaluate and Assert MAE
         run: |
+          # 1. Force the shell to exit immediately if any command fails
+          set -e 
+          
+          # 2. Run evaluation and capture output
           RESULTS=$(python -m src.evaluation)
+          echo "--- Full Evaluation Output ---"
           echo "$RESULTS"
+          echo "------------------------------"
+          
+          # 3. Export to environment variable for safe Python access
+          export EVAL_TEXT="$RESULTS"
+          
+          # 4. Run the gatekeeper script
           python -c "
-          import re, sys
-          text = '''$RESULTS'''
+          import re, sys, os
+          
+          # Retrieve text safely from environment
+          text = os.getenv('EVAL_TEXT', '')
+          
+          # Find the MAE value
           match = re.search(r'MAE[:\s]+([0-9]+\.[0-9]+)', text)
+          
           if not match:
+              print('❌ CRITICAL: Could not find MAE in the output!')
               sys.exit(1)
+          
           mae = float(match.group(1))
+          print(f'📊 Parsed MAE: {mae}')
+          
+          # Trigger failure if threshold is exceeded
           if mae > 6.0:
+              print(f'❌ FAIL: MAE {mae} is above the 6.0 limit. DEPLOYMENT BLOCKED.')
               sys.exit(1)
+          
+          print(f'✅ PASS: MAE {mae} is acceptable. PROCEEDING TO DEPLOY.')
           "
 
   deploy:
