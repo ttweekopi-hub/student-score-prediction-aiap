@@ -136,6 +136,10 @@ def evaluate_model():
     logger.info("-----------------------------------------")
     logger.info(f"   [TRAIN] RMSE: {train_rmse:.4f} marks  |  [TEST] RMSE: {test_rmse:.4f} marks")
     logger.info(f"   [TRAIN] MAE:  {train_mae:.4f} marks  |  [TEST] MAE:  {test_mae:.4f} marks")
+    # ADD THIS LINE HERE:
+    # This is a dedicated "machine-readable" output for GitHub Actions.
+    # It ensures the regex 'MAE[:\s]+([0-9]+\.[0-9]+)' finds the TEST MAE.
+    print(f"FINAL_METRICS >> MAE: {test_mae:.4f}")
     logger.info(f"   [TRAIN] R2:   {train_r2:.4f}        |  [TEST] R2:   {test_r2:.4f}")
     logger.info("-----------------------------------------")
 

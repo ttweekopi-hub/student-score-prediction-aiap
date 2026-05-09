@@ -51,7 +51,36 @@ my_project_root/
 
 ## 3. Instructions for Execution
 
-This pipeline supports three execution methods: Containerized (via Docker) for guaranteed reproducibility, a **one-click automated runner** (recommended for quick grading) and **manual step-by-step commands** (designed for custom experiments and model-swapping).
+> ### 📢 Update: 9/5/2026
+> **FastAPI & Swagger UI Integration Now Live!**
+> 
+> I have implemented a production-ready API layer. You can now start interactively test predictions on students O-level Math scores across three different models (**Random Forest**, **Gradient Boosting**, and **Linear Regression**) without having to install or download anything.
+>
+> 🌐 **Live API Testing (Swagger UI):** [https://student-score-prediction-aiap.onrender.com/docs](https://student-score-prediction-aiap.onrender.com/docs)
+>
+> 🛠 **How to Test the API**
+> 1. Navigate to the `/docs` link above.
+> 2. Click on the **POST** `/predict/rf` or `/predict/gbr` endpoint.
+> 3. Click **"Try it out"**.
+> 4. Use the following sample JSON payload:
+>
+> ```json
+> {
+>   "number_of_siblings": 2,
+>   "direct_admission": "No",
+>   "CCA": "Sports",
+>   "learning_style": "Visual",
+>   "tuition": "Yes",
+>   "n_male": 10,
+>   "student_age": 16,
+>   "hours_per_week": 15,
+>   "attendance_rate": 95,
+>   "sleep_duration": 8
+> }
+> ```
+> 📊 **Technical Deep-Dive:** Detailed API stress-testing and model sensitivity analysis can be found in [API_Testing_Analysis.md](./API_Testing_Analysis.md).
+
+This pipeline also supports three other execution methods: Containerized (via Docker) for guaranteed reproducibility, a **one-click automated runner** (recommended for quick grading) and **manual step-by-step commands** (designed for custom experiments and model-swapping).
 
 ### Option A (Docker)
 Before running via Docker, you must build the environment. This ensures all dependencies and SGT-localized logging utilities are baked in.
