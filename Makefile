@@ -16,7 +16,6 @@ ifdef model
 endif
 
 .PHONY: build preprocess train evaluate all
-
 build:
 	docker build -t $(IMAGE_NAME) .
 
@@ -33,3 +32,11 @@ evaluate:
 	docker run $(MODEL_VOL) $(LOG_VOL) $(IMAGE_NAME) src.evaluation --model $(MODEL)
 
 all: build preprocess train evaluate
+
+serve: build
+	python3 -m uvicorn src.serve:app --reload --port 8000
+
+# If using Docker to serve
+docker-serve:
+	docker run -p 8000:8000 student-score-prediction
+	
