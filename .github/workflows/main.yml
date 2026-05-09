@@ -55,7 +55,7 @@ jobs:
           text = os.getenv('EVAL_TEXT', '')
           
           # Find the MAE value
-          match = re.search(r'MAE[:\s]+([0-9]+\.[0-9]+)', text)
+          match = re.search(r'FINAL_METRICS >> MAE[:\s]+([0-9]+\.[0-9]+)', text)
           
           if not match:
               print('❌ CRITICAL: Could not find MAE in the output!')
