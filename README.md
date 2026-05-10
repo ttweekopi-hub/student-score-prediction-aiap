@@ -47,11 +47,11 @@ To align with robust software engineering practices, this pipeline completely av
 ### Automated CI/CD Pipeline (Quality Control)
 To ensure that only high-quality, verified models are deployed to the live API, I have implemented a **Continuous Integration and Continuous Deployment (CI/CD)** workflow using **GitHub Actions**.
 
+![Alt Text](assets/Github_Actions.png)
+
 * **Automated Quality Gate:** Every push to the `main` branch triggers an automated pipeline that builds the environment, generates a mock database, and executes the full end-to-end ML cycle (Preprocessing -> Training -> Evaluation).
 * **Performance Assertion:** The deployment process includes an **"Emergency Brake"** mechanism. If the newly trained model's Mean Absolute Error (MAE) exceeds the project threshold of **6.0**, the pipeline automatically fails and blocks the deployment to protect the production environment.
 * **Continuous Deployment (CD):** Once the model passes the quality gate, a secure webhook triggers an automatic redeploy to **Render**, ensuring the [Live Swagger UI](https://student-score-prediction-aiap.onrender.com/docs) always reflects the latest verified model version.<br>
-
-![Alt Text](assets/Github_Actions.png)
 
 ### File Structure & Output Destination
 Logs are stored in a centralized file located at the project root:
