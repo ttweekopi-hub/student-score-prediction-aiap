@@ -96,7 +96,14 @@ def process_data(df, config):
     # 1. Drop rows where target variable is missing
     target = config["data"]["target_column"]
     initial_len = len(df)
-    df = df.dropna(subset=[target])
+     # Only drop NaNs from the target if we are in "Training Mode" (target exists)
+    if target in df.columns:
+        df = df.dropna(subset=[target])
+    else:
+        # If target is missing, we are likely in "Inference/API Mode"
+        # Just skip this step!
+        pass
+    # df = df.dropna(subset=[target])
     dropped_target = initial_len - len(df)
     if dropped_target > 0:
         logger.warning(f"Dropped {dropped_target} rows missing the target column '{target}'.")
