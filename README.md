@@ -44,10 +44,13 @@ To align with robust software engineering practices, this pipeline completely av
 * **Timezone-Aware Timestamps:** All log entries are locked to **Singapore Standard Time (SGT, UTC+8)** using a custom timezone formatter. This ensures consistency regardless of whether the pipeline is executed locally, in a cloud VM, or on a grader's machine.
 * **Date & Time Format:** Timestamps follow the Singapore-localized date format: `DD-MM-YYYY HH:MM:SS SGT`.
 * **Multi-Destination Logging:** Logs are simultaneously streamed to the active console window (standard output) and appended to a centralized file.
+
+![Pipeline_logger](assets/pipeline_log.png)
+
 ### Automated CI/CD Pipeline (Quality Control)
 To ensure that only high-quality, verified models are deployed to the live API, I have implemented a **Continuous Integration and Continuous Deployment (CI/CD)** workflow using **GitHub Actions**.
 
-![Alt Text](assets/Github_Actions.png)
+![Github Actions](assets/Github_Actions.png)
 
 * **Automated Quality Gate:** Every push to the `main` branch triggers an automated pipeline that builds the environment, generates a mock database, and executes the full end-to-end ML cycle (Preprocessing -> Training -> Evaluation).
 * **Performance Assertion:** The deployment process includes an **"Emergency Brake"** mechanism. If the newly trained model's Mean Absolute Error (MAE) exceeds the project threshold of **6.0**, the pipeline automatically fails and blocks the deployment to protect the production environment.
