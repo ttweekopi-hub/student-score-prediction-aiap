@@ -100,10 +100,10 @@ my_project_root/
 This pipeline also supports three other execution methods: Containerized (via Docker) for guaranteed reproducibility, a **one-click automated runner** (recommended for quick grading) and **manual step-by-step commands** (designed for custom experiments and model-swapping).
 
 ### Option A (Docker)
-Before running via Docker, you must build the environment. This ensures all dependencies and SGT-localized logging utilities are baked in.
+You can pull the docker image for this use case by issuing the following command:
 
 ```bash
-make build
+docker pull ttweekopi/student-score-prediction
 ```
 
 The following commands work identically across Windows (WSL), Mac, and Linux. They utilize a "self-healing" Makefile that automatically creates local log files and mounts data/model volumes.
