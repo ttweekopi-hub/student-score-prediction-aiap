@@ -23,13 +23,13 @@ pull:
 	docker pull $(IMAGE_NAME)
 
 preprocess:
-	docker run $(DATA_VOL) $(LOG_VOL) $(IMAGE_NAME) src.preprocessing
+	docker run --rm $(DATA_VOL) $(LOG_VOL) $(IMAGE_NAME) src.preprocessing
 
 train:
-	docker run $(MODEL_VOL) $(LOG_VOL) $(IMAGE_NAME) src.train --model $(MODEL)
+	docker run --rm $(MODEL_VOL) $(LOG_VOL) $(IMAGE_NAME) src.train --model $(MODEL)
 
 evaluate:
-	docker run $(MODEL_VOL) $(LOG_VOL) $(IMAGE_NAME) src.evaluation --model $(MODEL)
+	docker run --rm $(MODEL_VOL) $(LOG_VOL) $(IMAGE_NAME) src.evaluation --model $(MODEL)
 
 all: build preprocess train evaluate
 
@@ -38,5 +38,5 @@ serve: build
 
 # If using Docker to serve
 docker-serve:
-	docker run -p 8000:8000 $(IMAGE_NAME)
+	docker run --rm -p 8000:8000 $(IMAGE_NAME)
 	
