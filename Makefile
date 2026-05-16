@@ -1,5 +1,5 @@
 # Variables
-IMAGE_NAME=student-score-pipeline
+IMAGE_NAME=student-score-prediction
 # Using absolute paths for reliability across different systems
 PWD=$(shell pwd)
 
@@ -38,5 +38,5 @@ serve: build
 
 # If using Docker to serve
 docker-serve:
-	docker run -p 8000:8000 student-score-prediction
+	docker run -p 8000:8000 $(IMAGE_NAME)
 	
