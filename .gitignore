@@ -25,4 +25,4 @@ data/*.csv
 models/*.pkl
 
 # Ignore local runtime logs
-pipeline.log
+logs/

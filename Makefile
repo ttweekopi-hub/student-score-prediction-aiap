@@ -1,12 +1,12 @@
 # Variables
-IMAGE_NAME=student-score-prediction
+IMAGE_NAME=ttweekopi/student-score-prediction
 # Using absolute paths for reliability across different systems
 PWD=$(shell pwd)
 
 # Volume definitions
 DATA_VOL=-v $(PWD)/data:/app/data
 MODEL_VOL=-v $(PWD)/data:/app/data -v $(PWD)/models:/app/models
-LOG_VOL=-v $(PWD)/pipeline.log:/app/pipeline.log
+LOG_VOL=-v $(PWD)/logs:/app/logs
 
 # Default model variable (can be overridden with MODEL=lr in terminal)
 MODEL ?= rf
@@ -15,20 +15,20 @@ ifdef model
     MODEL := $(model)
 endif
 
-.PHONY: build preprocess train evaluate all
+.PHONY: build pull preprocess train evaluate all
 build:
 	docker build -t $(IMAGE_NAME) .
 
+pull:
+	docker pull $(IMAGE_NAME)
+
 preprocess:
-	@touch pipeline.log
 	docker run $(DATA_VOL) $(LOG_VOL) $(IMAGE_NAME) src.preprocessing
 
 train:
-	@touch pipeline.log
 	docker run $(MODEL_VOL) $(LOG_VOL) $(IMAGE_NAME) src.train --model $(MODEL)
 
 evaluate:
-	@touch pipeline.log
 	docker run $(MODEL_VOL) $(LOG_VOL) $(IMAGE_NAME) src.evaluation --model $(MODEL)
 
 all: build preprocess train evaluate

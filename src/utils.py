@@ -21,7 +21,7 @@ class SingaporeFormatter(logging.Formatter):
             return sgt_dt.strftime(datefmt)
         return sgt_dt.strftime('%d-%m-%Y %H:%M:%S')
 
-def setup_logger(name, log_file="pipeline.log", level=logging.INFO):
+def setup_logger(name, log_file="logs/pipeline.log", level=logging.INFO):
     """Initialises and returns a named logger with SGT-aware formatting.
 
     Args:
