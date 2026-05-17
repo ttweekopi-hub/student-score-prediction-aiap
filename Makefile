@@ -33,8 +33,9 @@ evaluate:
 
 all: build preprocess train evaluate
 
-serve: build
+serve:
 	python3 -m uvicorn src.serve:app --reload --port 8000
+
 
 # If using Docker to serve
 docker-serve:

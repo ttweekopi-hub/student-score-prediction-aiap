@@ -19,23 +19,24 @@ student-score-prediction-aiap/
 ├── models/             # Stores the trained student_model.pkl
 ├── notebooks/          # Stores the Jupyter notebook file
 │   └── eda.ipynb       # Exploratory Data Analysis and visualizations
-├── scripts/          # Stores the Jupyter notebook file
+├── scripts/            # Utility Python scripts
 │   └── generate_test_data.py       # Generate mock database file
 ├── src/                # Python modules for the pipeline
 │   ├── preprocessing.py # Data ingestion, cleaning, and feature engineering
 │   ├── train.py         # Model training and pipeline serialization
-│   └── evaluation.py    # Performance metrics calculation
-│   └── utils.py         # Logging feature
+│   ├── evaluation.py    # Performance metrics calculation
+│   ├── utils.py         # Logging feature
 │   └── serve.py         # Load .pkl(model) files and expose them to REST endpoints
-└── .gitignore          # files/folders to be ignored by Git
-└── API_Testing_Analysis.md   # Documentation for using FastAPI through Swaggger UI
-└── Dockerfile          # Docker config file
-└── Makefile            # Orchestration script to standardize Docker and local commands
-└── README.md           # Project documentation and usage instructions
-└── config.json         # central control file to change model settings
-└── requirements.txt    # Python dependencies
+├── .gitignore          # files/folders to be ignored by Git
+├── API_Testing_Analysis.md   # Documentation for using FastAPI through Swagger UI
+├── Dockerfile          # Docker config file
+├── Makefile            # Orchestration script to standardize Docker and local commands
+├── README.md           # Project documentation and usage instructions
+├── config.json         # central control file to change model settings
+├── requirements.txt    # Python dependencies
 └── run.sh              # run script to auto-execute pipeline
 ```
+
 
 ## 2. Logging & Pipeline Monitoring (Production Features)
 
@@ -144,65 +145,88 @@ chmod +x run.sh
 ```
 ### Option C: Step-by-Step Execution (For Custom Experimentation)
 
-This is the alternative execution option for running the pipeline.  It is highly configurable (unlike the one-click automated option which runs just our best recommended Random Forest model) and supports execution with different machine learning algorithms and parameters using a combination of a configuration file (`config.json`) and command-line interface (CLI) parameter overrides.<br>
+This is the alternative execution option for running the pipeline. It is highly configurable (unlike the one-click automated option which runs just our best recommended Random Forest model) and supports execution with different machine learning algorithms and parameters using a combination of a configuration file (`config.json`) and command-line interface (CLI) parameter overrides.
+
 **Run all terminal commands from the root folder of the cloned repository (/student-score-prediction-aiap).**
 
-### 3.1. Install Dependencies:<br>
-    pip install -r requirements.txt
+### 3.1. Install Dependencies
 
-### 3.2 Run Preprocessing:<br>
-This fetches data via SQLite, cleans features, and performs feature engineering.<br>
+```bash
+pip install -r requirements.txt
+```
 
-    python -m src.preprocessing
+### 3.2 Run Preprocessing
 
-### 3.3 Model Training (With Model Swapping)<br>
-You can train models using the default settings in config.json or swap algorithms directly using command-line arguments.<br>
-<br>
-**<u>Option A: Train the Default Model (Random Forest)</u>**<br>
-This runs using the default hyperparameters and configuration specified inside config.json.<br>
-Output is saved to: models/student_model.pkl (as specified in config.json)<br>
-    
-    python -m src.train
+This fetches data via SQLite, cleans features, and performs feature engineering.
 
-**<u>Option B: Train a Linear Regression Baseline</u>**<br>
-Overrides the default model from the terminal. This automatically resets the hyperparameters to suit a linear baseline.<br>
-Output is saved to: models/LinearRegression_model.pkl<br>
+```bash
+python -m src.preprocessing
+```
 
-    python -m src.train --model lr
+### 3.3 Model Training (With Model Swapping)
 
+You can train models using the default settings in config.json or swap algorithms directly using command-line arguments.
 
-**<u>Option C: Train a Gradient Boosting Regressor</u>**<br>
-Output is saved to: models/gradientboostingregressor_model.pkl<br>
+#### Option A: Train the Default Model (Random Forest)
+This runs using the default hyperparameters and configuration specified inside `config.json`.
+Output is saved to: `models/student_model.pkl` (as specified in `config.json`)
 
-    python -m src.train --model gbr
+```bash
+python -m src.train
+```
 
+#### Option B: Train a Linear Regression Baseline
+Overrides the default model from the terminal. This automatically resets the hyperparameters to suit a linear baseline.
+Output is saved to: `models/LinearRegression_model.pkl`
 
+```bash
+python -m src.train --model lr
+```
 
-### 3.4 Model Evaluation:<br>
-Evaluate your trained models dynamically by passing matching command-line arguments.<br>
-<br>
-**<u>Evaluate Default Model (Random Forest):</u>**<br>
+#### Option C: Train a Gradient Boosting Regressor
+Output is saved to: `models/gradientboostingregressor_model.pkl`
 
-    python -m src.evaluation
+```bash
+python -m src.train --model gbr
+```
 
-**<u>Evaluate Linear Regression:</u>**
+### 3.4 Model Evaluation
 
-    python -m src.evaluation --model lr
+Evaluate your trained models dynamically by passing matching command-line arguments.
 
-**<u>Evaluate Gradient Boosting:</u>**<br>
+#### Evaluate Default Model (Random Forest)
 
-    python -m src.evaluation --model gbr
+```bash
+python -m src.evaluation
+```
 
-All evaluation will output the final RMSE and R² scores.
+#### Evaluate Linear Regression
 
-### 3.5 Start the FastAPI Server:<br>
+```bash
+python -m src.evaluation --model lr
+```
+
+#### Evaluate Gradient Boosting
+
+```bash
+python -m src.evaluation --model gbr
+```
+
+All evaluations will output the final RMSE, MAE, and R² scores.
+
+### 3.5 Start the FastAPI Server
+
 You can locally host the API with the trained models using the command below. The server will automatically reload upon code changes and expose the Swagger UI on `http://localhost:8000/docs`.
 
-    make serve
+```bash
+make serve
+```
 
 Alternatively, run the Uvicorn server directly:
 
-    python -m uvicorn src.serve:app --reload --port 8000
+```bash
+python -m uvicorn src.serve:app --reload --port 8000
+```
 
 ## 4. Pipeline flow and Logical Steps
 
@@ -232,7 +256,7 @@ The pipeline follows a sequential flow from raw data to evaluation:
 | `CCA` | Categorical | Normalized into consistent categories: 'Clubs', 'Sports', 'None' | To ensure the OneHotEncoder correctly interpreted "None" as a valid behavioral state rather than a missing value. |
 | `bag_color` | Categorical | Dropped | Cosmetic attribute with no plausible causal relationship to academic performance; confirmed absent from EDA correlation analysis. |
 
-## 📊 Data Quality & Cleaning Findings<br>
+## 📊 Data Quality & Cleaning Findings
 Target Variable Integrity: During the initial data audit, 495 rows were identified as missing the target variable (final_test).
 
 Action Taken: These rows were deliberately dropped from the pipeline rather than using imputation.
@@ -243,11 +267,12 @@ Multicollinearity (Gender Distribution): Analysis of classroom demographics reve
 
 ## 6. Choice of Model and Evaluation
 
-To promote easy experimentation, all model training configurations are centralized. The workflow can be fine-tuned using the following parameters:<br>
-<br>
-**<u>The Configuration Command Center (config.json)</u>**<br>
-The *config.json* file controls directories, database targets, column modifications, and default model hyperparameters:<br>
-<br>
+To promote easy experimentation, all model training configurations are centralized. The workflow can be fine-tuned using the following parameters:
+
+### The Configuration Command Center (`config.json`)
+
+The `config.json` file controls directories, database targets, column modifications, and default model hyperparameters:
+
 ```json
 {
   "data": {
@@ -259,29 +284,29 @@ The *config.json* file controls directories, database targets, column modificati
   },
   "model": {
     "algorithm": "RandomForestRegressor",
-        "parameters": {
-        "n_estimators": 200,
-        "max_depth": 10,
-        "min_samples_leaf": 5,
-        "min_samples_split": 10,
-        "random_state": 42
-  },
+    "parameters": {
+      "n_estimators": 200,
+      "max_depth": 10,
+      "min_samples_leaf": 5,
+      "min_samples_split": 10,
+      "random_state": 42
+    },
     "save_path": "models/student_model.pkl"
   }
 }
 ```
 
-## 7. Choice of Evaluated Algorithms: <br>
+## 7. Choice of Evaluated Algorithms
 
-**<u>Random Forest Regressor (Default Ensemble Model)</u>**<br>
+### Random Forest Regressor (Default Ensemble Model)
 *Why Chosen*: Excellent at capturing complex interaction thresholds in student habits (such as the non-linear relationship of the high importance of a lack of CCA vs. the low importance of specific CCAs).
-<br>
-*Strengths*: Extremely robust against multi-modal distributions and requires no scaling.<br>
-<br>
-**<u>Gradient Boosting Regressor (Sequential Ensemble Model)</u>**<br>
-*Why Chosen*: Builds trees sequentially to minimize residual errors, often achieving tighter fitting and lower error margins than Random Forest.<br>
-<br>
-**<u>Linear Regression (Baseline Parametric Model)</u>**<br>
+
+*Strengths*: Extremely robust against multi-modal distributions and requires no scaling.
+
+### Gradient Boosting Regressor (Sequential Ensemble Model)
+*Why Chosen*: Builds trees sequentially to minimize residual errors, often achieving tighter fitting and lower error margins than Random Forest.
+
+### Linear Regression (Baseline Parametric Model)
 *Why Chosen*: Serves as a vital baseline to quantify the performance boost gained by transitioning to non-linear tree-based models.
 
 ## 8. Model Evaluation Results (Test Set Evaluation)
