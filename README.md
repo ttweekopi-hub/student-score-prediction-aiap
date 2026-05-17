@@ -15,6 +15,7 @@ The pipeline is designed to predict final mathematics scores using student demog
 student-score-prediction-aiap/
 ├── assets/             # Stores screenshot images
 ├── data/               # Contains cleaned_score.csv (score.db must be placed here)
+├── logs/               # Stores the generated pipeline logs
 ├── models/             # Stores the trained student_model.pkl
 ├── notebooks/          # Stores the Jupyter notebook file
 │   └── eda.ipynb       # Exploratory Data Analysis and visualizations
@@ -44,6 +45,7 @@ To align with robust software engineering practices, this pipeline completely av
 * **Timezone-Aware Timestamps:** All log entries are locked to **Singapore Standard Time (SGT, UTC+8)** using a custom timezone formatter. This ensures consistency regardless of whether the pipeline is executed locally, in a cloud VM, or on a grader's machine.
 * **Date & Time Format:** Timestamps follow the Singapore-localized date format: `DD-MM-YYYY HH:MM:SS SGT`.
 * **Multi-Destination Logging:** Logs are simultaneously streamed to the active console window (standard output) and appended to a centralized file.
+* **Duplicate Log Prevention & Docker Compatibility:** Handlers are strictly managed to prevent duplicate log lines. The console handler explicitly uses `sys.stdout` for reliable log visibility across Docker, WSL, and standard terminals, while log propagation is disabled to keep output clean.
 
 ![Pipeline_logger](assets/pipeline_log.png)
 
@@ -57,10 +59,11 @@ To ensure that only high-quality, verified models are deployed to the live API, 
 * **Continuous Deployment (CD):** Once the model passes the quality gate, a secure webhook triggers an automatic redeploy to **Render**, ensuring the [Live Swagger UI](https://student-score-prediction-aiap.onrender.com/docs) always reflects the latest verified model version.<br>
 
 ### File Structure & Output Destination
-Logs are stored in a centralized file located at the project root:
+Logs are stored in a dedicated `logs` directory to keep the project root clean (the directory is automatically created if it doesn't exist):
 ```text
-my_project_root/
-└── pipeline.log             # Generated automatically on script execution
+student-score-prediction-aiap/
+└── logs/
+    └── pipeline.log             # Generated automatically on script execution
 ```
 
 **The pipeline also supports containerized execution via Docker — see Option A in Section 3.**
@@ -106,7 +109,7 @@ You can pull the docker image for this use case by issuing the following command
 docker pull ttweekopi/student-score-prediction
 ```
 
-The following commands work identically across Windows (WSL), Mac, and Linux. They utilize a "self-healing" Makefile that automatically creates local log files and mounts data/model volumes.
+The following commands work identically across Windows (WSL), Mac, and Linux. They utilize a "self-healing" Makefile that automatically mounts data, model, and log volumes (e.g., `-v $(PWD)/logs:/app/logs`), ensuring that logs generated within Docker are safely persisted locally.
 
 | Action | Docker Command | Local Python Command |
 | :--- | :--- | :--- |
@@ -117,6 +120,7 @@ The following commands work identically across Windows (WSL), Mac, and Linux. Th
 | **Evaluate Model (Linear Reg)** | `make evaluate model=lr` | `python -m src.evaluation --model lr` |
 | **Train (Gradient Boost Regressor)** | `make train model=gbr` | `python -m src.train --model gbr` |
 | **Evaluate Model (Gradient Boost Regressor)** | `make evaluate model=gbr` | `python -m src.evaluation --model gbr` |
+| **Start FastAPI Server** | `make docker-serve` | `make serve` |
 
 To ease input for the commands, alias have been set up for each model as follows:<br>
 | Alias | Machine Learning Algorithm |
@@ -190,6 +194,15 @@ Evaluate your trained models dynamically by passing matching command-line argume
     python -m src.evaluation --model gbr
 
 All evaluation will output the final RMSE and R² scores.
+
+### 3.5 Start the FastAPI Server:<br>
+You can locally host the API with the trained models using the command below. The server will automatically reload upon code changes and expose the Swagger UI on `http://localhost:8000/docs`.
+
+    make serve
+
+Alternatively, run the Uvicorn server directly:
+
+    python -m uvicorn src.serve:app --reload --port 8000
 
 ## 4. Pipeline flow and Logical Steps
 
